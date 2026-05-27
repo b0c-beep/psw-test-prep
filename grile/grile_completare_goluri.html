@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grile Completare Goluri — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:17px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+#stats{display:flex;gap:12px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;}
+#stats span{background:var(--surface2);padding:3px 10px;border-radius:20px;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#container{max-width:800px;margin:0 auto;padding:28px 20px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;transition:border-color .2s;}
+.q-card.answered{border-color:var(--border);}
+.q-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-python{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3);}
+.cat-pandas{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3);}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.cat-teorie{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre.q-code{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);margin:8px 0 12px;line-height:1.6;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-text{font-size:13px;line-height:1.5;}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#a7f3d0;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:32px;font-weight:700;color:var(--accent-light);}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>Grile Completare — Goluri din examenele anterioare neacoperite în alte fișiere</h1>
+  <div id="stats">
+    <span id="total-count">0 grile</span>
+    <span style="color:var(--green)" id="correct-count">✓ 0</span>
+    <span style="color:var(--red)" id="wrong-count">✗ 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleAll()">🔀 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">↺ Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">👁 Răspunsuri</button>
+</div>
+<div id="container">
+  <div id="score-box"><h2 id="score-text">0/0</h2><p id="score-pct" style="color:var(--text-muted);margin-top:6px;"></p></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('python',this)">Python</button>
+    <button class="filter-btn" onclick="filterCat('pandas',this)">Pandas</button>
+    <button class="filter-btn" onclick="filterCat('streamlit',this)">Streamlit</button>
+    <button class="filter-btn" onclick="filterCat('sas',this)">SAS</button>
+    <button class="filter-btn" onclick="filterCat('teorie',this)">Teorie</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+<script>
+const questions = [
+// ===== PYTHON (întrebări neacoperite în celelalte fișiere) =====
+{cat:"python",text:"Ce operator verifică IDENTITATEA (nu valoarea) în Python?<pre class='q-code'>x = [1, 2, 3]\ny = [1, 2, 3]\nprint(x == y)\nprint(x is y)</pre>",opts:["== verifică identitatea; is verifică valoarea","== verifică VALOAREA; is verifică IDENTITATEA (același obiect)","Sunt echivalenți","Ambele verifică identitatea"],correct:1,ex:"== verifică EGALITATEA valorilor. is verifică IDENTITATEA (dacă două nume referă ACELAȘI obiect în memorie). x==y=True, x is y=False."},
+{cat:"python",text:"Ce afișează următorul cod?<pre class='q-code'>def f(value, values):\n    value = 10\n    values[0] = 44\nt = 3\nv = [1, 2, 3]\nf(t, v)\nprint(t, v[0])</pre>",opts:["10 44","3 1","3 44","10 1"],correct:2,ex:"În Python, int e IMUTABIL (pasat prin valoare). t rămâne 3. Lista e MUTABILĂ — modificarea values[0]=44 se reflectă în lista originală v."},
+{cat:"python",text:"Ce returnează d1 == d2 dacă d1={'john':40,'peter':45} și d2={'peter':45,'john':40}?",opts:["False — ordinea cheilor diferă","True — dicționarele se compară prin CONȚINUT, nu ordine","Eroare TypeError","Depinde de versiunea Python"],correct:1,ex:"Dicționarele în Python se compară prin CONȚINUT (chei + valori). d1==d2 returnează True chiar dacă ordinea de inserare diferă."},
+{cat:"python",text:"Cum se șterge un dicționar întreg (variabila) din memorie?<pre class='q-code'>d = {'a':1, 'b':2}\n???\nprint(d) # Eroare</pre>",opts:["d.clear()","d.pop()","d = None","del d"],correct:3,ex:"del d șterge VARIABILA. d.clear() golește dicționarul dar variabila rămâne ca {}."},
+{cat:"python",text:"Care metode NU sunt valide pentru un SET?<pre class='q-code'>s = {1, 2, 3}</pre>",opts:["s.add(4) și s.remove(2)","s.keys() și s.values()","s.update([4,5]) și s.discard(1)","s.pop() și s.clear()"],correct:1,ex:"keys() și values() sunt metode specifice DICȚIONARELOR, nu seturilor. Seturile au add(), remove(), discard(), pop(), clear(), update()."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>d = {(1,2,3):8, (4,5,6):10, (7,8,9):12}\nprint(len(d), sum(d.values()))</pre>",opts:["3 30","3 8","9 30","Eroare — tuplurile nu pot fi chei"],correct:0,ex:"Tuplurile sunt IMUTABILE și HASHABLE, deci pot fi chei de dicționar. len(d)=3. sum(d.values())=8+10+12=30."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>a = [1, 2, 3]\nb = a\na = a + [4]\nprint(b)\na += [5]\nprint(a)</pre>",opts:["[1,2,3,4] [1,2,3,4,5]","[1,2,3] [1,2,3,4,5]","[1,2,3] [1,2,3,5]","[1,2,3,4] [1,2,3,5]"],correct:1,ex:"a = a + [4] creează o listă NOUĂ și o atribuie lui a (b nu e afectat). a += [5] = a.extend([5]) = MODIFICĂ lista existentă (in-place), deci numai a e afectat."},
+{cat:"python",text:"Ce este o funcție GENERATOR în Python?",opts:["O funcție care returnează o listă","O funcție care conține YIELD și produce valori LA CERERE (lazy evaluation)","O funcție care generează numere aleatoare","O funcție care nu returnează nimic"],correct:1,ex:"Generator = funcție cu yield. Nu calculează toate valorile deodată, ci le produce LA CERERE (lazy). Eficient pentru date mari."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print(3 * 'ab')</pre>",opts:["'3*ab'","'ababab'","Eroare","'3ab'"],correct:1,ex:"* pe string = REPETIȚIE. 'ab' * 3 = 'ababab' (nu 'ab' de 3 ori, ci stringul 'ab' repetat de 3 ori)."},
+{cat:"python",text:"Ce face raises în Python? (ex: raise ValueError('msg'))",opts:["Prinde o excepție","LANSEAZĂ (declanșează) o excepție intenționat","Ignoră o excepție","Definește o excepție"],correct:1,ex:"raise declanșează INTENȚIONAT o excepție (similar cu throw în alte limbaje). 'raise ValueError('x')' aruncă o eroare de tip ValueError."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>x = 10\nx += 5 if x > 5 else 2\nprint(x)</pre>",opts:["15","17","12","Eroare"],correct:0,ex:"Expresia ternară: x > 5 → True, deci 5. x += 5 → x = 10+5 = 15."},
+{cat:"python",text:"Ce face funcția `zip` dacă liste de lungimi diferite?",opts:["Eroare — lungimile trebuie să coincidă","Se oprește la cea mai SCURTĂ listă","Completează cu None pentru cea mai scurtă","Completează cu 0"],correct:1,ex:"zip() se oprește la cea mai SCURTĂ listă (nu dă eroare). Pentru completare cu None: zip_longest din itertools."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print('python'.find('th'))</pre>",opts:["1","2","True","Eroare"],correct:1,ex:"str.find(sub) returnează INDEXUL primei apariții a subșirului. 'python' → p=0, y=1, t=2, h=3, o=4, n=5. 'th' începe la indexul 2."},
+{cat:"python",text:"Cum se transformă o listă de tupluri în dicționar?<pre class='q-code'>lst = [('a',1), ('b',2), ('c',3)]</pre>",opts:["dict.fromkeys(lst)","dict(lst)","lst.to_dict()","pd.Series(lst)"],correct:1,ex:"dict(lst) convertește o listă de perechi (cheie, valoare) în dicționar. dict.fromkeys(lst) ar da chei=tupluri, valori=None."},
+
+// ===== PANDAS (întrebări neacoperite) =====
+{cat:"pandas",text:"Ce face următorul cod?<pre class='q-code'>data = pd.DataFrame({'A':[1,2,3], 'B':[4,5,6]})\nprint(data.drop(['A'], axis=1))</pre>",opts:["Aruncă o eroare — drop nu există","Șterge rândul cu indexul A","Returnează DataFrame cu COLOANA A ȘTEARSĂ (axis=1 = coloane)","Returnează DataFrame fără rândul 1"],correct:2,ex:"drop(['A'], axis=1) ȘTERGE COLOANA A. axis=1 = coloane. axis=0 = rânduri. Rezultatul conține doar coloana B."},
+{cat:"pandas",text:"Ce face df['col'].notna()?",opts:["Returnează True pentru valori NON-NULL (False pentru NaN)","Returnează True pentru NaN","Completează NaN cu 0","Returnează numărul de valori non-null"],correct:0,ex:"notna() (alias notnull()) returnează mască booleană: True unde valoarea NU e NaN, False unde e NaN."},
+{cat:"pandas",text:"Cum se calculează diferența dintre rânduri consecutive într-o coloană?",opts:["df['col'].shift() - df['col']","df['col'].diff()","df['col'].pct_change()","df['col'].rolling(2).apply(lambda x: x[1]-x[0])"],correct:1,ex:"diff() calculează diferențele dintre elemente consecutive. diff(1) = valoare_curentă - valoare_anterioară. shift() doar deplasează."},
+{cat:"pandas",text:"Ce face df.loc[df['A'] > 2, 'A'] = 0?",opts:["Filtrează rândurile cu A>2","Setează A=0 DOAR pentru rândurile care îndeplinesc condiția","Șterge rândurile cu A>2","Setează A=0 pentru TOATE rândurile"],correct:1,ex:"df.loc[condiție, coloană] = valoare actualizează DOAR celulele care satisfac condiția. Coloana A devine [1,2,0] pentru valorile > 2."},
+{cat:"pandas",text:"Ce returnează df['col'].mode()?",opts:["Media coloanei","Mediana coloanei","Valoarea (valorile) care apare de cele mai multe ori (MODUL)","Răspândirea datelor"],correct:2,ex:"mode() returnează MODULUL (valoarea cu frecvența maximă). Poate returna mai multe valori dacă există egalitate."},
+{cat:"pandas",text:"Cum se citește un fișier CSV cu antet (header) pe linia 2 (0-indexat)?",opts:["pd.read_csv('f.csv', header=0)","pd.read_csv('f.csv', header=1)","pd.read_csv('f.csv', skiprows=0)","pd.read_csv('f.csv', header=2)"],correct:1,ex:"header=1 = linia 2 (0-indexat) e interpretată ca antet. header=0 (implicit) = prima linie e antet."},
+{cat:"pandas",text:"Ce face df['col'].clip(lower=0, upper=100)?",opts:["Elimină valorile sub 0 și peste 100","TRUNCHIAZĂ valorile: le aduce la intervalul [0,100]","Creează un histogramă","Sortează valorile"],correct:1,ex:"clip() limitează valorile la intervalul specificat. Valorile < 0 devin 0. Valorile > 100 devin 100."},
+{cat:"pandas",text:"Ce efect are `df.to_excel('f.xlsx', index=False)`?",opts:["Salvează indexul în prima coloană","Salvează FĂRĂ index (index=False = fără coloana de index în Excel)","Suprimă salvarea unei coloane","Salvează doar indexul"],correct:1,ex:"index=False = nu scrie coloana index (0,1,2,...) în fișier. Implicit (True), indexul e scris ca primă coloană."},
+{cat:"pandas",text:"Ce face set_index('ID', drop=False)?",opts:["Șterge coloana ID din DataFrame","Setează ID ca index DAR PĂSTREAZĂ coloana ID în DataFrame","Resetează indexul la 0,1,2...","Setează ID ca index și o șterge din coloane"],correct:1,ex:"drop=False păstrează coloana ID și în DataFrame (nu doar ca index). drop=True (implicit) o elimină din coloane."},
+{cat:"pandas",text:"Cum se combină două DataFrame-uri cu aceleași coloane (unul sub altul)?",opts:["pd.merge(df1, df2, on='col')","pd.concat([df1, df2], axis=0)","df1.join(df2)","pd.concat([df1, df2], axis=1)"],correct:1,ex:"pd.concat([df1, df2], axis=0) = concatenare VERTICALĂ (rânduri). axis=1 = concatenare orizontală (coloane)."},
+{cat:"pandas",text:"Ce face df['col'].agg(['min', 'max', 'mean'])?",opts:["Aplică funcțiile și returnează un dicționar","Returnează un Series cu valorile min, max, mean","Eroare — agg nu funcționează pe o singură coloană","Returnează min, max, mean per rând"],correct:1,ex:"agg pe o coloană (Series) returnează un Series cu valorile fiecărei funcții. Pe DataFrame, returnează DataFrame."},
+{cat:"pandas",text:"Ce face `pd.options.display.max_rows = 10`?",opts:["Limitează afișarea la max 10 coloane","Limitează afișarea la max 10 RÂNDURI","Setează indexul la 10","Șterge rândurile > 10"],correct:1,ex:"Setează opțiunea globală de afișare: max_rows = nr. maxim de rânduri afișate (restul sunt înlocuite cu '...')."},
+
+// ===== STREAMLIT (întrebări neacoperite) =====
+{cat:"streamlit",text:"Ce face st.warning('Atenție!')?",opts:["Afișează un pop-up","Afișează un mesaj cu fundal GALBEN (avertisment)","Oprește execuția scriptului","Trimite un email de avertizare"],correct:1,ex:"st.warning() afișează un mesaj cu fundal GALBEN — pentru avertismente. Celelalte: success (verde), info (albastru), error (roșu)."},
+{cat:"streamlit",text:"Cum se verifică dacă un buton a fost apăsat într-un formular?",opts:["if st.form_submit_button():","if st.session_state.submit:","Nu se poate — formularul se trimite automat","Prin callback on_click"],correct:0,ex:"st.form_submit_button() returnează True când e apăsat (similar cu st.button). Se folosește DOAR în interiorul st.form()."},
+{cat:"streamlit",text:"Ce face st.container() în Streamlit?",opts:["Creează un container DOCKER","Creează un element de layout invizibil care grupează conținut — util pentru ordine dinamică","Creează un buton","Creează o nouă pagină"],correct:1,ex:"st.container() creează un container invizibil. Poți adăuga elemente în ordine dinamică: with st.container(): st.write('ceva')."},
+{cat:"streamlit",text:"Cum se afișează un video în Streamlit?",opts:["st.video('cale_video.mp4')","st.media('video.mp4')","st.show_video('video.mp4')","st.play('video.mp4')"],correct:0,ex:"st.video() afișează un player video. Acceptă URL YouTube, fișier local, sau bytes. Similar: st.image() și st.audio()."},
+{cat:"streamlit",text:"Ce face st.session_state.items()?",opts:["Nu există — session_state nu are items()","Returnează perechi (cheie, valoare) din sesiune — la fel ca un dicționar","Șterge toate variabilele din sesiune","Listează doar cheile"],correct:1,ex:"st.session_state se comportă ca un dicționar. Poți folosi .keys(), .values(), .items(), len(), 'in' etc."},
+{cat:"streamlit",text:"Cum se șterge o variabilă din session_state?",opts:["del st.session_state['var']","st.session_state.remove('var')","st.session_state.pop('var')","Ambele a) și c)"],correct:3,ex:"Atât del st.session_state['var'] cât și st.session_state.pop('var') șterg o cheie. pop() returnează suplimentar valoarea."},
+{cat:"streamlit",text:"Ce se întâmplă dacă st.set_page_config() NU este primul apel Streamlit?",opts:["Funcționează normal","Generează eroare — trebuie să fie PRIMUL apel Streamlit","Se aplică parțial","Generează un avertisment dar funcționează"],correct:1,ex:"st.set_page_config() trebuie să fie PRIMUL apel Streamlit. Dacă există orice alt conținut înainte, generează eroare."},
+{cat:"streamlit",text:"Cum se creează un buton de download pentru un DataFrame CSV?",opts:["st.download_button('Downl', df.to_csv(), 'f.csv')","csv = df.to_csv(index=False).encode('utf-8'); st.download_button('Downl', csv, 'f.csv', mime='text/csv')","st.export_csv(df)","st.save_button('Downl', df)"],correct:1,ex:"Trebuie codificat explicit: .to_csv(index=False).encode('utf-8') + mime='text/csv'. Datele trebuie să fie string/bytes."},
+
+// ===== SAS (întrebări din restanță + examene vechi neacoperite) =====
+{cat:"sas",text:"Ce face 'data _null_;' în SAS?",opts:["Creează un set de date NULL (gol)","NU creează niciun set de date — folosit doar pentru procesare/logare (PUT) fără ieșire","Șterge toate datele din WORK","Creează un set temporar cu 0 observații"],correct:1,ex:"DATA _NULL_ = creează 0 seturi de date. Util pentru: calcul fără salvare, scriere în log cu PUT, generare fișiere text."},
+{cat:"sas",text:"Câte secțiuni (DATA + PROC) conține programul?<pre class='q-code'>libname a '...';\ndata a.x; set a.y; run;\nproc print data=a.x; run;\nproc means data=a.x; run;</pre>",opts:["4 secțiuni (libname e secțiune)","3 secțiuni: 1 DATA + 2 PROC (libname NU e secțiune)","2 secțiuni: 1 DATA + 1 PROC","1 secțiune"],correct:1,ex:"LIBNAME nu e secțiune (e o instrucțiune globală). DATA step = 1 secțiune. PROC PRINT + PROC MEANS = 2 secțiuni de proceduri. Total: 3 secțiuni."},
+{cat:"sas",text:"Ce face 'proc contents data=orion._all_ nods; run;'?",opts:["Afișează conținutul tuturor seturilor din lib orion","Listează metadatele TUTUROR seturilor din biblioteca orion (fără zona descriptor)","Afișează doar setul _ALL_","Creează un set nou _ALL_"],correct:1,ex:"_ALL_ = toate seturile. NODS = No DataSet listing (nu afișează per set informațiile detaliate). Util pentru inventariere rapidă."},
+{cat:"sas",text:"Setul orion.sales are 9 variabile. Se execută:<pre class='q-code'>data work.comp;\n  set orion.sales;\n  drop Gender Salary Birth_Date;\nrun;</pre>Câte variabile are work.comp?",opts:["9","6","3","0"],correct:1,ex:"9 variabile - 3 variabile DROP = 6 variabile rămân. DROP elimină variabilele specificate din SETUL DE IEȘIRE (dar ele sunt disponibile pentru calcul)."},
+{cat:"sas",text:"Se adaugă o variabilă calculată la exemplul anterior:<pre class='q-code'>data work.comp;\n  set orion.sales;\n  Compensation = sum(Salary, Bonus);\n  drop Gender Salary Country;\nrun;</pre>Câte variabile are work.comp?",opts:["9","7","8","10"],correct:1,ex:"9 var originale + 1 var nouă (Compensation) = 10, minus 3 DROP = 7 variabile rămân. Salary e disponibil pentru calcul (sum) dar eliminat la OUTPUT."},
+{cat:"sas",text:"Ce face 'data a; set b; by ID; if first.ID then cumul=0; cumul+valoare; if last.ID then output; run;'?",opts:["Calculează totalul per grup ID — scrie DOAR ultima observație din fiecare grup","Calculează media per grup","Sortează datele","Elimină duplicatele"],correct:0,ex:"FIRST.ID resetează cumul la 0 per grup. cumul+valoare = acumulator. LAST.ID = ultima observație → output → total per grup ID."},
+{cat:"sas",text:"Ce face 'proc means data=orion.sales; var pret; run;'?",opts:["Afișează primele rânduri ale coloanei pret","Calculează indicatori STATISTICI (medie, std, min, max etc.) pentru variabila pret","Creează un grafic pentru pret","Sortează după pret"],correct:1,ex:"PROC MEANS fără opțiuni = indicatori statistici de bază pentru variabilele numerice listate în VAR."},
+{cat:"sas",text:"Ce realizează codul?<pre class='q-code'>data a b; set work.c; if x>0 then output a; else output b; run;</pre>",opts:["Creează 1 set de date a","Creează DOUĂ seturi de date (a și b) în WORK — temporare","Creează a permanent și b temporar","Eroare de sintaxă"],correct:1,ex:"'data a b;' listează MULTIPLE seturi de ieșire. SAS creează ambele (în WORK = temporare). OUTPUT controlează în care set se scrie observația."},
+{cat:"sas",text:"Ce face 'merge clienti(in=CL) comenzi(in=CO); by ID; if CL=0 and CO=1;'?",opts:["Clienții care au dat comenzi (inner)","Comenzile care NU au clienți asociați","Clienții fără comenzi","Toate combinațiile"],correct:1,ex:"CL=0 = clientul nu există în clienti. CO=1 = există în comenzi. Deci = comenzi care NU au client asociat."},
+{cat:"sas",text:"Care format SAS este INVALID ca nume de format definit de utilizator?",opts:["$gen","punctaj","comma","$nota."],correct:2,ex:"'comma' este un FORMAT PREDEFINIT SAS pentru numere cu separator de mii. Nu poți defini un utilizator cu același nume. $ la început = caracter."},
+{cat:"sas",text:"În ce ordine trebuie sortate datele pentru BY în PROC PRINT după Gender și StartDate?",opts:["by StartDate Gender;","by Gender; (prima variabilă de sortare)","by Gender StartDate; (aceeași ordine ca în SORT)","Nu e nevoie de sortare"],correct:2,ex:"BY în PROC (sau DATA) trebuie să respecte ordinea din PROC SORT. Dacă s-a sortat 'by Gender StartDate', atunci în BY se folosește aceeași ordine."},
+{cat:"sas",text:"Care este valoarea lui Total după execuția DATA step?<pre class='q-code'>data incasari;\n  input Zi $ Venit;\n  Total + Venit;\ndatalines;\nLuni 1000\nMarti 1500\nMiercuri .\nJoi 2000\n; run;</pre>",opts:["4500","3500 — ignoră Miercuri (lipsă)","1000 — doar prima valoare","Eroare — . generează eroare"],correct:1,ex:"Total + Venit; (fără =) = acumulator. Inițiat cu 0. Ignoră valoarea lipsă (.) de Miercuri. 0+1000=1000, +1500=2500, +0=2500, +2000=4500."},
+{cat:"sas",text:"Ce face instrucțiunea @@ în SAS la citirea datelor?",opts:["Citește UN rând per observație","Permite MULTIPLE observații pe aceeași linie (hold line)","Adună două variabile","Setează formatul de citire"],correct:1,ex:"@@ (double trailing @) menține pointerul pe aceeași linie după citire, permițând citirea mai multor observații de pe aceeași linie."},
+{cat:"sas",text:"Ce face 'where amount le 5000 or rate eq 0.095;'? (Operatorii: le=<=, eq==)",opts:["Eroare — operatori invalizi","Selectează amount<=5000 SAU rate=0.095 (corect)","Selectează amount<=5000 ȘI rate=0.095","Selectează amount<5000 ȘI rate<0.095"],correct:1,ex:"Operatori: le=<=, eq==, lt=<, gt=>, ge=>=, ne=^=. WHERE cu 'or' → condiția e adevărată dacă ORICARE e adevărată."},
+{cat:"sas",text:"Ce face 'proc sort data=orion.staff out=work.staff; by descending Salary Manager_ID; run;'?",opts:["Salary descrescător; Manager_ID ascendent (descending se aplică doar variabilei imediat următoare)","Ambele descrescător","Salary ascendent; Manager_ID descrescător","Eroare"],correct:0,ex:"'descending' se aplică DOAR variabilei imediat următoare. Deci Salary desc, Manager_ID asc. Pentru ambele desc: 'by descending Salary descending Manager_ID;'."},
+{cat:"sas",text:"Ce face 'data a; do i=1 to 5; output; end; run;'?",opts:["Creează o observație cu i=5","Creează 5 observații (i=1,2,3,4,5) — câte una per iterație","Buclă infinită","Eroare — DO fără SET"],correct:1,ex:"Buclă DO cu OUTPUT în interior = scrie o observație la fiecare iterație → setul a conține 5 observații cu i=1,2,3,4,5."},
+{cat:"sas",text:"Ce face 'select; when (x>5) y=1; when (x>10) y=2; otherwise y=0; end;'?",opts:["Evaluează condițiile în ordine; execută PRIMA care e adevărată (x>5 suficient)","Execută TOATE WHEN adevărate","Evaluează x","Eroare — SELECT fără expresie nu există"],correct:0,ex:"SELECT fără expresie evaluează condițiile booleene în ordine. Prima WHEN adevărată se execută; restul se sar (break implicit)."},
+
+// ===== TEORIE (întrebări neacoperite) =====
+{cat:"teorie",text:"Ce reprezintă un 'contract de utilizare' neexclusiv al unui program?",opts:["Utilizatorul poate folosi programul și alți utilizatori pot primi același drept de la producător","Utilizatorul este SINGURUL cu drept de utilizare (nimeni altcineva nu poate folosi)","Programul poate fi modificat","Programul poate fi redistribuit gratuit"],correct:0,ex:"Drept NEEXCLUSIV = producătorul poate acorda același drept de utilizare și altora. Exclusiv = doar un singur utilizator poate folosi."},
+{cat:"teorie",text:"Ce condiții trebuie îndeplinite pentru reproducerea codului FĂRĂ autorizare (interoperabilitate)?",opts:["Persoana deține dreptul de utilizare a copiei ȘI informațiile necesare NU sunt ușor accesibile altfel","E întotdeauna interzisă","E permisă doar pentru software open-source","Nu necesită nicio condiție"],correct:0,ex:"Legea permite reproducerea pentru interoperabilitate cu condiția: (1) utilizatorul deține dreptul de utilizare + (2) informațiile nu sunt ușor accesibile altfel."},
+{cat:"teorie",text:"Ce este FREE Software (software liber)?",opts:["Software distribuit GRATUIT","Software care garantează 4 libertăți: utilizare, studiu, adaptare, distribuire — COSTUL NU e un criteriu","Software cu trial gratuit","Software open-source"],correct:1,ex:"Free Software = libertate, nu preț. Cele 4 libertăți (Free Software Foundation): 0) utilizare orice scop, 1) studiu cod, 2) redistribuire copii, 3) distribuire versiuni modificate."},
+{cat:"teorie",text:"Ce se înțelege prin 'analiză DESCRIPTIVĂ' a datelor?",opts:["Ce trebuie să facem — optimizare","Ce s-a întâmplat — raportare, vizualizare trenduri","Ce se va întâmpla — prognoze","Colectarea datelor"],correct:1,ex:"Analiza descriptivă = 'Ce s-a întâmplat?' Modelare/vizualizare/raportare date istorice. Predictivă = 'Ce se va întâmpla?' Prescriptivă = 'Ce trebuie să facem?'"},
+{cat:"teorie",text:"Ce face SHAREware diferit de freeware?",opts:["E același lucru","Shareware = perioadă de PROBĂ (trial); freeware = gratuit pentru utilizare (fără limită de timp)","Shareware e gratuit; freeware e cu plată","Shareware e open-source"],correct:1,ex:"Shareware = distribuit gratuit pentru EVALUARE pe o perioadă limitată (după care se plătește). Freeware = gratuit permanent dar proprietar."},
+{cat:"teorie",text:"Care procedură SAS face parte din SAS/OR?",opts:["PROC REG — regresie","PROC GANTT — planificare proiecte","PROC CORR — corelație","PROC TIMESERIES — serii de timp"],correct:1,ex:"SAS/OR (Operations Research) include PROC GANTT (grafice Gantt), PROC LP (linear programming), PROC TRANSPORT etc. SAS/STAT = REG, CORR. SAS/ETS = serii de timp."},
+{cat:"teorie",text:"Ce înseamnă OLAP (Online Analytical Processing)?",opts:["Procesare tranzacțională","Procesare ANALITICĂ multidimensională — interogări rapide pe cuburi de date","Procesare în timp real","Procesare batch"],correct:1,ex:"OLAP = sisteme pentru analiză multidimensională (cuburi cu dimensiuni și măsuri). Ex: timp x regiune x produs → vânzări. Răspuns rapid la interogări complexe."},
+{cat:"teorie",text:"Ce conține ZONA DE DESCRIERE a unui set de date SAS?",opts:["Datele propriu-zise","Metadatele: nume set, dată creare, nume/tip/lungime variabile, etichete","Comentariile programului","Macro-urile definite"],correct:1,ex:"Zona de descriere = metadate (vizualizate cu PROC CONTENTS). Zona de DATE = observațiile propriu-zise (vizualizate cu PROC PRINT)."},
+{cat:"teorie",text:"Ce este SAS/IML?",opts:["Un modul pentru Machine Learning","Un limbaj specializat pentru MATRICE (Interactive Matrix Language)","Un modul pentru import date","Un modul pentru rapoarte"],correct:1,ex:"SAS/IML oferă un limbaj pentru operații cu MATRICE și vectori. Similar cu MATLAB. Util pentru algoritmi numerici și statistici."},
+{cat:"teorie",text:"Ce înseamnă 'date NESTRUCTURATE' în contextul datelor de intrare pentru prelucrare?",opts:["Date organizate în tabele (rânduri și coloane)","Date FĂRĂ structură predefinită: text, imagini, video, audio, social media","Date numerice","Date din baze de date relaționale"],correct:1,ex:"Date structurate = CSV, Excel, SQL tables. Date semistructurate = JSON, XML. Date NESTRUCTURATE = text liber, imagini, video, audio (fără schemă)."},
+{cat:"teorie",text:"Ce face PROC STANDARD în SAS?",opts:["Standardizează variabilele (medie=0, abatere=1) — similar cu StandardScaler","Creează un raport standard","Creează formate standard","Sortează datele"],correct:0,ex:"PROC STANDARD standardizează variabilele numerice la medie=0 și abatere standard=1 (z-scores). Opțiunile: mean=0 std=1."},
+{cat:"teorie",text:"Ce este un 'cub OLAP'?",opts:["O bază de date tridimensională","O structură de date multidimensională care permite interogări pe multiple dimensiuni (timp, regiune, produs etc.)","Un raport 3D","Un tabel special"],correct:1,ex:"Cub OLAP = structură multidimensională (nu neapărat 3D — poate avea N dimensiuni). Fiecare celulă conține o măsură (ex: vânzări)."},
+{cat:"teorie",text:"Ce face PROC DATASETS în SAS (dincolo de simpla listare)?",opts:["Doar listează seturile","Permite copierea, redenumirea, ștergerea seturilor și modificarea atributelor variabilelor (labels, formats etc.) fără a citi datele","Creează seturi noi","Importă date"],correct:1,ex:"PROC DATASETS = utilitar de întreținere. Copiază, redenumește, șterge seturi. Modifică etichete/formate fără rescrierea datelor."},
+];
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, dispIdx) => {
+    const globalIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card' + (answered[globalIdx] !== undefined ? ' answered' : '');
+    div.id = 'q-' + globalIdx;
+    const letters = ['a','b','c','d'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[globalIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[globalIdx] && answered[globalIdx] !== q.correct) cls += ' wrong';
+      }
+      const letter = letters[i] || String.fromCharCode(97 + i);
+      return `<div class="${cls}" onclick="selectAnswer(${globalIdx},${i})">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`;
+    }).join('');
+    let fbHtml = '';
+    if (answered[globalIdx] !== undefined) {
+      const isC = answered[globalIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isC?'correct-fb':'wrong-fb'} show">${isC?'✓ Corect! ':'✗ Greșit! '}${q.ex}</div>`;
+    }
+    div.innerHTML = `<div class="q-meta"><span class="q-num">#${dispIdx+1}</span><span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span></div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>${fbHtml}`;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(gi, oi) {
+  if (answered[gi] !== undefined) return;
+  answered[gi] = oi;
+  if (oi === questions[gi].correct) correctCount++; else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '✓ ' + correctCount;
+  document.getElementById('wrong-count').textContent = '✗ ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% răspunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleAll() {
+  for (let i = questions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [q.opts[i],q.opts[j]] = [q.opts[j],q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q,i) => { if (answered[i]===undefined) answered[i]=q.correct; });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>
