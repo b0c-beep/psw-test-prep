@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python - Recapitulare PSW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22253a;
+  --border: #2d3154;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --green: #10b981;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --orange: #f97316;
+  --blue: #3b82f6;
+  --code-bg: #0d1117;
+  --warn-bg: #2d2200;
+  --warn-border: #f59e0b;
+  --tip-bg: #002d1a;
+  --tip-border: #10b981;
+  --danger-bg: #2d0505;
+  --danger-border: #ef4444;
+  --info-bg: #001a2d;
+  --info-border: #3b82f6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+/* NAV */
+#nav { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 20px 0; z-index: 100; }
+#nav h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); padding: 0 20px 12px; }
+#nav a { display: block; padding: 7px 20px; color: var(--text-muted); text-decoration: none; font-size: 13px; border-left: 2px solid transparent; transition: all .2s; }
+#nav a:hover, #nav a.active { color: var(--accent-light); border-left-color: var(--accent); background: rgba(99,102,241,.08); }
+#nav .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #4a5568; padding: 16px 20px 4px; }
+
+/* MAIN */
+#main { margin-left: 260px; padding: 40px 48px; max-width: 960px; }
+.page-title { font-size: 32px; font-weight: 700; margin-bottom: 6px; background: linear-gradient(135deg, var(--accent-light), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { color: var(--text-muted); font-size: 15px; margin-bottom: 40px; }
+
+/* SECTIONS */
+.section { margin-bottom: 48px; scroll-margin-top: 80px; }
+h2.sec-title { font-size: 20px; font-weight: 600; color: var(--accent-light); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+h3.sub-title { font-size: 15px; font-weight: 600; color: var(--text); margin: 20px 0 10px; }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+
+/* CODE */
+pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; margin: 12px 0; }
+code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface2); padding: 2px 6px; border-radius: 4px; color: #a5b4fc; }
+pre code { background: none; padding: 0; color: var(--text); }
+.kw { color: #c084fc; }
+.fn { color: #38bdf8; }
+.str { color: #86efac; }
+.num { color: #fb923c; }
+.cm { color: #475569; }
+.var { color: #e2e8f0; }
+
+/* ALERTS */
+.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+.warn::before { content: "⚠️ ATENȚIE: "; font-weight: 700; color: var(--yellow); }
+.tip { background: var(--tip-bg); border: 1px solid var(--tip-border); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+.tip::before { content: "✓ REȚINE: "; font-weight: 700; color: var(--green); }
+.danger { background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+.danger::before { content: "✗ EROARE FRECVENTĂ: "; font-weight: 700; color: var(--red); }
+.info { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+.info::before { content: "ℹ INFO: "; font-weight: 700; color: var(--blue); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+th { background: var(--surface2); color: var(--accent-light); padding: 10px 14px; text-align: left; font-weight: 600; border: 1px solid var(--border); }
+td { padding: 9px 14px; border: 1px solid var(--border); }
+tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+/* BADGE */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; margin: 2px; }
+.badge-red { background: rgba(239,68,68,.15); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+.badge-green { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.3); }
+.badge-yellow { background: rgba(245,158,11,.15); color: #fcd34d; border: 1px solid rgba(245,158,11,.3); }
+.badge-blue { background: rgba(59,130,246,.15); color: #93c5fd; border: 1px solid rgba(59,130,246,.3); }
+
+/* COMPARE */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.compare-box { background: var(--surface2); border-radius: 8px; padding: 14px; }
+.compare-box h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.compare-box.ok h4 { color: var(--green); }
+.compare-box.bad h4 { color: var(--red); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+@media (max-width: 900px) {
+  #nav { display: none; }
+  #main { margin-left: 0; padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <h2>PSW — Python</h2>
+  <div class="section-label">Tipuri de date</div>
+  <a href="#lists">Liste</a>
+  <a href="#tuples">Tupluri</a>
+  <a href="#sets">Seturi</a>
+  <a href="#dicts">Dictionare</a>
+  <div class="section-label">Control Flow</div>
+  <a href="#conditionals">If / Elif / Else</a>
+  <a href="#loops">Bucle For / While</a>
+  <a href="#range">range()</a>
+  <div class="section-label">Functii</div>
+  <a href="#functions">Definitii & Scope</a>
+  <a href="#lambda">Lambda & Map/Filter</a>
+  <div class="section-label">Operatii</div>
+  <a href="#sorting">Sortare</a>
+  <a href="#strings">Siruri de caractere</a>
+  <a href="#files">Fisiere</a>
+  <div class="section-label">Capcane examen</div>
+  <a href="#traps">Capcane frecvente</a>
+</nav>
+
+<main id="main">
+  <h1 class="page-title">Python — Recapitulare</h1>
+  <p class="page-sub">Materia pentru examenul PSW · Sintaxă, exemple concrete, avertizări</p>
+
+  <!-- ====== LISTE ====== -->
+  <section class="section" id="lists">
+    <h2 class="sec-title">Liste</h2>
+    <div class="card">
+      <p>Listele sunt <strong>ordonate</strong>, <strong>modificabile</strong> și permit <strong>duplicate</strong>. Se definesc cu <code>[]</code>.</p>
+      <table>
+        <tr><th>Proprietate</th><th>Valoare</th></tr>
+        <tr><td>Ordonate</td><td><span class="badge badge-green">DA</span></td></tr>
+        <tr><td>Modificabile (mutable)</td><td><span class="badge badge-green">DA</span></td></tr>
+        <tr><td>Permit duplicate</td><td><span class="badge badge-green">DA</span></td></tr>
+        <tr><td>Acces prin index</td><td><span class="badge badge-green">DA</span></td></tr>
+      </table>
+    </div>
+
+    <h3 class="sub-title">Operații de bază</h3>
+    <pre><code><span class="var">a</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="str">"text"</span>, <span class="kw">None</span>, [], ()]
+<span class="fn">print</span>(<span class="fn">len</span>(a))        <span class="cm"># 7 — numără TOATE elementele, inclusiv None/[]/() </span>
+
+a.<span class="fn">append</span>(<span class="num">99</span>)        <span class="cm"># adaugă UN element la sfârșit</span>
+a.<span class="fn">insert</span>(<span class="num">0</span>, <span class="str">"x"</span>)    <span class="cm"># inserează la poziția 0</span>
+a.<span class="fn">remove</span>(<span class="num">2</span>)         <span class="cm"># șterge prima apariție a valorii 2</span>
+<span class="fn">del</span> a[<span class="num">0</span>]            <span class="cm"># șterge elementul de la index 0</span>
+a.<span class="fn">pop</span>()             <span class="cm"># șterge și returnează ultimul element</span></code></pre>
+
+    <div class="danger">
+      <code>list.append()</code> acceptă UN SINGUR argument. <code>a.append(2, "Scott")</code> → <strong>ERROR</strong>
+    </div>
+
+    <h3 class="sub-title">Slicing (tăiere)</h3>
+    <pre><code><span class="var">nums</span> = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+nums[<span class="num">1</span>:<span class="num">4</span>]    <span class="cm"># [1, 2, 3] — capătul din dreapta EXCLUSIV</span>
+nums[:<span class="num">3</span>]     <span class="cm"># [0, 1, 2]</span>
+nums[<span class="num">3</span>:]     <span class="cm"># [3, 4, 5]</span>
+nums[-<span class="num">1</span>]     <span class="cm"># 5 — ultimul element</span>
+nums[::-<span class="num">1</span>]   <span class="cm"># [5, 4, 3, 2, 1, 0] — inversare</span>
+
+<span class="cm"># Indici pari: range(0, len, 2)</span>
+<span class="var">t</span> = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">3</span>, <span class="num">8</span>, <span class="num">9</span>)
+[t[i] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">0</span>, <span class="fn">len</span>(t), <span class="num">2</span>)]  <span class="cm"># [1, 4, 8] — indici 0, 2, 4</span></code></pre>
+
+    <h3 class="sub-title">List Comprehension</h3>
+    <pre><code>[x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]               <span class="cm"># [0, 1, 4, 9, 16]</span>
+[x <span class="kw">for</span> x <span class="kw">in</span> nums <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]       <span class="cm"># doar numerele pare</span>
+
+<span class="cm"># Parsare input text cu comprehension:</span>
+names = [x.<span class="fn">strip</span>() <span class="kw">for</span> x <span class="kw">in</span> product_names.<span class="fn">split</span>(<span class="str">","</span>)]
+prices = [<span class="fn">float</span>(x.<span class="fn">strip</span>()) <span class="kw">for</span> x <span class="kw">in</span> prices_str.<span class="fn">split</span>(<span class="str">","</span>)]</code></pre>
+
+    <div class="tip">
+      <code>len([1, 2, 3, None, (), {}])</code> → <strong>6</strong>. Elementele goale (None, tuple gol, dict gol) se numără ca elemente normale.
+    </div>
+  </section>
+
+  <!-- ====== TUPLURI ====== -->
+  <section class="section" id="tuples">
+    <h2 class="sec-title">Tupluri</h2>
+    <div class="card">
+      <table>
+        <tr><th>Proprietate</th><th>Valoare</th></tr>
+        <tr><td>Ordonate</td><td><span class="badge badge-green">DA</span></td></tr>
+        <tr><td>Modificabile (mutable)</td><td><span class="badge badge-red">NU — IMUTABILE</span></td></tr>
+        <tr><td>Permit duplicate</td><td><span class="badge badge-green">DA</span></td></tr>
+        <tr><td>Sintaxă</td><td><code>()</code></td></tr>
+      </table>
+    </div>
+
+    <pre><code><span class="var">t</span> = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)
+x, y, z = t         <span class="cm"># unpacking</span>
+<span class="fn">tuple</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])     <span class="cm"># (1, 2, 3) — din listă</span>
+
+<span class="cm"># Returnare multiplă din funcție = tuplu</span>
+<span class="kw">def</span> <span class="fn">stats</span>(x):
+    <span class="kw">return</span> <span class="fn">min</span>(x), <span class="fn">max</span>(x), <span class="fn">sum</span>(x)  <span class="cm"># returnează tuplu</span></code></pre>
+
+    <div class="danger">
+      Tuplul este <strong>IMUTABIL</strong>:
+      <ul style="margin-top:8px;margin-left:20px;">
+        <li><code>my_tuple.append(x)</code> → <strong>AttributeError</strong> (tuplul nu are metoda append)</li>
+        <li><code>a = (1, 2); a[0] += 1</code> → <strong>TypeError</strong></li>
+        <li><code>del a</code> (unde a este tuplu) → <strong>funcționează</strong> — șterge variabila (nu elementul)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ====== SETURI ====== -->
+  <section class="section" id="sets">
+    <h2 class="sec-title">Seturi</h2>
+    <div class="card">
+      <table>
+        <tr><th>Proprietate</th><th>Valoare</th></tr>
+        <tr><td>Ordonate</td><td><span class="badge badge-red">NU — neordonate</span></td></tr>
+        <tr><td>Valori unice</td><td><span class="badge badge-green">DA — elimină duplicatele</span></td></tr>
+        <tr><td>Sintaxă</td><td><code>{}</code> sau <code>set()</code></td></tr>
+      </table>
+    </div>
+
+    <pre><code><span class="var">s</span> = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>, <span class="num">2</span>, <span class="num">1</span>}   <span class="cm"># {1, 2, 3} — duplicatele sunt eliminate</span>
+
+<span class="cm"># Operații pe seturi</span>
+s1 | s2    <span class="cm"># reuniune (union)</span>
+s1 & s2    <span class="cm"># intersecție</span>
+s1 - s2    <span class="cm"># diferență</span>
+
+<span class="cm"># Operatorul 'in' funcționează cu seturi</span>
+<span class="num">2</span> <span class="kw">in</span> {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}  <span class="cm"># True</span></code></pre>
+  </section>
+
+  <!-- ====== DICTIONARE ====== -->
+  <section class="section" id="dicts">
+    <h2 class="sec-title">Dictionare</h2>
+    <div class="card">
+      <table>
+        <tr><th>Proprietate</th><th>Valoare</th></tr>
+        <tr><td>Acces</td><td>PRIN CHEIE (nu prin index numeric)</td></tr>
+        <tr><td>Chei</td><td>Unice + Imutabile (string, int, tuple)</td></tr>
+        <tr><td>Valori</td><td>Orice tip, poate fi duplicat</td></tr>
+        <tr><td>Sintaxă</td><td><code>{"cheie": valoare}</code></td></tr>
+      </table>
+    </div>
+
+    <pre><code><span class="var">d</span> = {<span class="str">"john"</span>: <span class="num">40</span>, <span class="str">"peter"</span>: <span class="num">45</span>}
+
+d[<span class="str">"john"</span>]              <span class="cm"># 40 — acces prin cheie</span>
+d[<span class="str">"city"</span>] = <span class="str">"NY"</span>      <span class="cm"># adaugă/modifică</span>
+d.<span class="fn">get</span>(<span class="str">"C"</span>, <span class="num">0</span>)         <span class="cm"># 0 — returnează default dacă cheia nu există</span>
+d.<span class="fn">items</span>()             <span class="cm"># iterare perechi (cheie, valoare)</span>
+d.<span class="fn">keys</span>(), d.<span class="fn">values</span>() <span class="cm"># cheile / valorile</span>
+
+<span class="cm"># Comparare dicționare</span>
+d1 = {<span class="str">"john"</span>: <span class="num">40</span>}; d2 = {<span class="str">"john"</span>: <span class="num">466</span>}
+d1 == d2   <span class="cm"># False — compară conținutul (valorile diferă)</span>
+
+<span class="cm"># Operatorul 'in' verifică CHEILE</span>
+<span class="str">"bar"</span> <span class="kw">in</span> {<span class="str">"foo"</span>: <span class="num">1</span>, <span class="str">"bar"</span>: <span class="num">2</span>}   <span class="cm"># True</span>
+
+<span class="cm"># Exemplu: dict.get + dict acces</span>
+date = {<span class="str">"A"</span>: <span class="num">10</span>, <span class="str">"B"</span>: <span class="num">20</span>}
+date.<span class="fn">get</span>(<span class="str">"C"</span>, <span class="num">0</span>) + date[<span class="str">"A"</span>]   <span class="cm"># 0 + 10 = 10</span></code></pre>
+
+    <div class="info">
+      Operatorul <code>in</code> funcționează cu <strong>list</strong>, <strong>set</strong> și <strong>dict</strong> (pentru dict verifică cheile).
+    </div>
+  </section>
+
+  <!-- ====== CONDITIONALS ====== -->
+  <section class="section" id="conditionals">
+    <h2 class="sec-title">If / Elif / Else</h2>
+    <pre><code><span class="kw">if</span> x > <span class="num">0</span>:
+    <span class="fn">print</span>(<span class="str">"pozitiv"</span>)
+<span class="kw">elif</span> x == <span class="num">0</span>:
+    <span class="fn">print</span>(<span class="str">"zero"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"negativ"</span>)
+
+<span class="cm"># Operator ternar (ternary)</span>
+result = <span class="str">"Positive"</span> <span class="kw">if</span> x > <span class="num">0</span> <span class="kw">else</span> <span class="str">"Negative"</span></code></pre>
+
+    <div class="warn">
+      Python este <strong>CASE-SENSITIVE</strong>: <code>'Amir'</code> ≠ <code>'amir'</code>.<br>
+      Exemplu: <code>if 'amir' in ['Amir', 'Barry']</code> → <strong>False</strong> → merge pe else.
+    </div>
+
+    <div class="info">
+      Blocul se termină printr-o <strong>linie indentată mai puțin</strong> decât linia anterioară (spre deosebire de <code>{}</code> în alte limbaje).
+    </div>
+  </section>
+
+  <!-- ====== LOOPS ====== -->
+  <section class="section" id="loops">
+    <h2 class="sec-title">Bucle For / While</h2>
+    <pre><code><span class="cm"># For — iterare secvență</span>
+<span class="kw">for</span> x <span class="kw">in</span> [<span class="num">10</span>, <span class="num">20</span>]:
+    <span class="kw">for</span> y <span class="kw">in</span> [<span class="str">"Chair"</span>, <span class="str">"Table"</span>]:
+        <span class="fn">print</span>(x, y)
+<span class="cm"># 10 Chair / 10 Table / 20 Chair / 20 Table (produs cartezian)</span>
+
+<span class="cm"># While</span>
+x = <span class="num">0</span>
+<span class="kw">while</span> x < <span class="num">100</span>:
+    x += <span class="num">2</span>
+<span class="fn">print</span>(x)   <span class="cm"># 100</span>
+
+<span class="cm"># break / continue / pass</span>
+<span class="kw">break</span>      <span class="cm"># iese complet din buclă</span>
+<span class="kw">continue</span>   <span class="cm"># sare la iterația următoare</span>
+<span class="kw">pass</span>       <span class="cm"># placeholder, nu face nimic</span></code></pre>
+
+    <div class="warn">
+      La bucle imbricate, numărați iterațiile: <code>range(10)</code> × <code>range(-1,-10,-1)</code> = 10 × 9 = <strong>90</strong> iterații.
+    </div>
+  </section>
+
+  <!-- ====== RANGE ====== -->
+  <section class="section" id="range">
+    <h2 class="sec-title">range()</h2>
+    <pre><code><span class="fn">range</span>(<span class="num">5</span>)           <span class="cm"># 0, 1, 2, 3, 4</span>
+<span class="fn">range</span>(<span class="num">2</span>, <span class="num">8</span>)        <span class="cm"># 2, 3, 4, 5, 6, 7  (capăt EXCLUSIV)</span>
+<span class="fn">range</span>(<span class="num">5</span>, <span class="num">16</span>, <span class="num">5</span>)   <span class="cm"># 5, 10, 15</span>
+<span class="fn">range</span>(<span class="num">0</span>, <span class="fn">len</span>(t), <span class="num">2</span>)  <span class="cm"># indici pari: 0, 2, 4, ...</span>
+<span class="fn">range</span>(-<span class="num">1</span>, -<span class="num">10</span>, -<span class="num">1</span>)  <span class="cm"># -1, -2, ..., -9  (9 valori)</span></code></pre>
+
+    <div class="danger">
+      <code>range()</code> acceptă doar <strong>INT</strong>. <code>range(0.5, 5.5, 0.5)</code> → <strong>TypeError</strong>
+    </div>
+  </section>
+
+  <!-- ====== FUNCTIONS ====== -->
+  <section class="section" id="functions">
+    <h2 class="sec-title">Funcții și Scope</h2>
+    <pre><code><span class="cm"># Parametri cu valoare implicită</span>
+<span class="kw">def</span> <span class="fn">power</span>(base, exponent=<span class="num">2</span>):
+    <span class="kw">return</span> base ** exponent
+
+<span class="fn">power</span>(<span class="num">3</span>)      <span class="cm"># 9 (exponent=2 implicit)</span>
+<span class="fn">power</span>(<span class="num">3</span>, <span class="num">3</span>)   <span class="cm"># 27 (exponent=3 suprascrie)</span>
+
+<span class="cm"># *args și **kwargs</span>
+<span class="kw">def</span> <span class="fn">f</span>(*args, **kwargs): ...  <span class="cm"># liste și dicționare de argumente</span>
+
+<span class="cm"># Returnare multiplă (returnează tuplu)</span>
+<span class="kw">def</span> <span class="fn">stats</span>(x):
+    <span class="kw">return</span> <span class="fn">min</span>(x), <span class="fn">max</span>(x), <span class="fn">sum</span>(x)</code></pre>
+
+    <div class="warn">
+      <strong>SCOPE LOCAL vs GLOBAL:</strong><br>
+      O variabilă definită <em>în interiorul</em> unei funcții este LOCALĂ — nu modifică variabila globală cu același nume.
+    </div>
+    <pre><code>salary = <span class="num">8000</span>                    <span class="cm"># variabilă GLOBALĂ</span>
+<span class="kw">def</span> <span class="fn">printSalary</span>():
+    salary = <span class="num">12000</span>               <span class="cm"># variabilă LOCALĂ (diferită!)</span>
+    <span class="fn">print</span>(salary)                <span class="cm"># 12000</span>
+
+<span class="fn">printSalary</span>()
+<span class="fn">print</span>(salary)                    <span class="cm"># 8000 — variabila globală e neschimbată</span>
+
+<span class="cm"># Modificare globală — folosiți 'global'</span>
+<span class="kw">def</span> <span class="fn">modify</span>():
+    <span class="kw">global</span> salary
+    salary = <span class="num">12000</span>               <span class="cm"># acum modifică globala</span></code></pre>
+
+    <div class="warn">
+      <strong>Liste vs scalari la pasare în funcții:</strong><br>
+      Listele sunt mutable → modificările în funcție afectează originalul.
+    </div>
+    <pre><code><span class="kw">def</span> <span class="fn">f</span>(value, values):
+    values[<span class="num">0</span>] = <span class="num">44</span>       <span class="cm"># modifică lista originală (mutable)</span>
+    value = <span class="num">99</span>            <span class="cm"># NU modifică variabila originală (scalar)</span>
+
+t = <span class="num">3</span>; v = [<span class="num">1</span>, <span class="num">2</span>]
+<span class="fn">f</span>(t, v)
+<span class="fn">print</span>(t, v[<span class="num">0</span>])   <span class="cm"># 3 44 — t neschimbat, v[0] modificat</span></code></pre>
+  </section>
+
+  <!-- ====== LAMBDA ====== -->
+  <section class="section" id="lambda">
+    <h2 class="sec-title">Lambda, Map, Filter</h2>
+    <pre><code><span class="cm"># Lambda — funcție anonimă</span>
+square = <span class="kw">lambda</span> x: x**<span class="num">2</span>
+square(<span class="num">5</span>)   <span class="cm"># 25</span>
+
+<span class="cm"># map — aplică funcția pe fiecare element</span>
+<span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x*<span class="num">2</span>, [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]))   <span class="cm"># [2, 4, 6]</span>
+
+<span class="cm"># filter — filtrează elementele</span>
+<span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x%<span class="num">2</span>==<span class="num">0</span>, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>]))  <span class="cm"># [2, 4]</span>
+
+<span class="cm"># sorted cu key</span>
+students = [(<span class="str">"Ana"</span>, <span class="num">8</span>), (<span class="str">"Bob"</span>, <span class="num">6</span>), (<span class="str">"Cara"</span>, <span class="num">9</span>)]
+<span class="fn">sorted</span>(students, key=<span class="kw">lambda</span> s: s[<span class="num">1</span>])  <span class="cm"># sortare după notă</span></code></pre>
+  </section>
+
+  <!-- ====== SORTING ====== -->
+  <section class="section" id="sorting">
+    <h2 class="sec-title">Sortare</h2>
+    <div class="compare">
+      <div class="compare-box ok">
+        <h4>sorted() — listă nouă</h4>
+        <pre style="margin:0"><code>note = [<span class="num">7</span>,<span class="num">9</span>,<span class="num">6</span>,<span class="num">10</span>]
+rez = <span class="fn">sorted</span>(note)
+<span class="cm"># note = [7,9,6,10] NESCHIMBAT</span>
+<span class="cm"># rez  = [6,7,9,10] NOUĂ</span></code></pre>
+      </div>
+      <div class="compare-box bad">
+        <h4>.sort() — modifică in-place</h4>
+        <pre style="margin:0"><code>note = [<span class="num">7</span>,<span class="num">9</span>,<span class="num">6</span>,<span class="num">10</span>]
+note.<span class="fn">sort</span>()
+<span class="cm"># note = [6,7,9,10] MODIFICAT</span>
+<span class="cm"># returnează None !</span></code></pre>
+      </div>
+    </div>
+    <div class="warn">
+      <strong>Examen:</strong> <code>note=[7,9,6,10]; rez=sorted(note); print(note[0], rez[0])</code>
+      → afișează <code>7 6</code> (note[0] rămâne 7, rez[0]=6 ca minim)
+    </div>
+  </section>
+
+  <!-- ====== STRINGS ====== -->
+  <section class="section" id="strings">
+    <h2 class="sec-title">Șiruri de caractere</h2>
+    <pre><code>s = <span class="str">"Seminar, pachete software"</span>
+s.<span class="fn">split</span>(<span class="str">","</span>)     <span class="cm"># ['Seminar', ' pachete software']</span>
+s.<span class="fn">strip</span>()       <span class="cm"># elimină spațiile de la capete</span>
+s.<span class="fn">upper</span>()       <span class="cm"># majuscule</span>
+s.<span class="fn">isupper</span>()     <span class="cm"># True dacă TOATE caracterele sunt majuscule</span>
+<span class="fn">len</span>(s)          <span class="cm"># numărul de caractere</span>
+
+<span class="cm"># Indexare negativă</span>
+names = [<span class="str">'Amir'</span>, <span class="str">'Barry'</span>, <span class="str">'Charles'</span>, <span class="str">'Dao'</span>]
+names[-<span class="num">1</span>][-<span class="num">1</span>]   <span class="cm"># 'o' — ultimul caracter al ultimului element ('Dao')</span>
+
+<span class="cm"># Concatenare tip</span>
+x = <span class="str">"10"</span>; y = <span class="num">5</span>
+x + <span class="fn">str</span>(y)    <span class="cm"># "105" (str trebuie să fie un ȘABLON, nu clasa str!)</span>
+x + <span class="fn">str</span>       <span class="cm"># TypeError — str este o CLASĂ, nu un șir</span></code></pre>
+  </section>
+
+  <!-- ====== FILES ====== -->
+  <section class="section" id="files">
+    <h2 class="sec-title">Citire / Scriere fișiere</h2>
+    <pre><code><span class="cm"># Citire cu context manager</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"raport.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:
+    linii = f.<span class="fn">readlines</span>()    <span class="cm"># listă de linii</span>
+    <span class="fn">print</span>(<span class="fn">len</span>(linii))         <span class="cm"># NUMĂRUL DE LINII din fișier</span>
+
+<span class="cm"># Moduri de deschidere</span>
+<span class="cm"># "r" = citire, "w" = scriere (suprascrie), "a" = append, "rb" = binar</span>
+
+<span class="cm"># Tratare excepții</span>
+<span class="kw">try</span>:
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"f.txt"</span>) <span class="kw">as</span> f: ...
+<span class="kw">except</span> (ValueError, TypeError) <span class="kw">as</span> e:
+    <span class="fn">print</span>(e)
+<span class="kw">finally</span>:
+    ...   <span class="cm"># se execută ÎNTOTDEAUNA (chiar și la excepție)</span></code></pre>
+  </section>
+
+  <!-- ====== TRAPS ====== -->
+  <section class="section" id="traps">
+    <h2 class="sec-title">⚠️ Capcane frecvente la examen</h2>
+
+    <div class="card" style="border-color: var(--red);">
+      <h3 class="sub-title" style="color:var(--red)">Erori comune</h3>
+      <table>
+        <tr><th>Cod</th><th>Efect</th></tr>
+        <tr><td><code>list.append(2, "x")</code></td><td>❌ ERROR — un singur argument</td></tr>
+        <tr><td><code>range(0.5, 5.5)</code></td><td>❌ ERROR — doar int</td></tr>
+        <tr><td><code>tuplu.append(x)</code></td><td>❌ AttributeError — tuplul e imutabil</td></tr>
+        <tr><td><code>tuplu[0] += 1</code></td><td>❌ TypeError</td></tr>
+        <tr><td><code>"x" + str</code></td><td>❌ TypeError — str este clasa, nu șir</td></tr>
+        <tr><td><code>if 'amir' in ['Amir']</code></td><td>❌ False — case-sensitive</td></tr>
+        <tr><td><code>sorted()</code> modifică lista</td><td>❌ FALS — returnează nouă, originala neschimbată</td></tr>
+        <tr><td><code>del a</code> pe tuplu</td><td>✓ Funcționează — șterge variabila</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">isinstance() și tipuri</h3>
+      <pre><code><span class="fn">isinstance</span>(<span class="num">3.14</span>, <span class="fn">float</span>)    <span class="cm"># True</span>
+<span class="fn">isinstance</span>(<span class="str">"hi"</span>, <span class="fn">str</span>)     <span class="cm"># True</span>
+<span class="fn">int</span>(<span class="str">"100"</span>) * <span class="num">2</span>            <span class="cm"># 200 — conversie tip</span>
+<span class="fn">type</span>(x)                    <span class="cm"># tipul variabilei</span>
+<span class="cm"># Tipuri de bază: int, float, str, bool, complex (2+3j), NoneType</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">Dicționar — creare validă</h3>
+      <pre><code><span class="cm"># TOATE variantele de mai jos creează dicționar:</span>
+d = {}                         <span class="cm"># dicționar gol</span>
+d = {<span class="str">"john"</span>: <span class="num">40</span>, <span class="str">"peter"</span>: <span class="num">45</span>}  <span class="cm"># cheie string</span>
+d = {<span class="num">40</span>: <span class="str">"john"</span>, <span class="num">45</span>: <span class="str">"peter"</span>} <span class="cm"># cheie int</span></code></pre>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">Execuție cod cu print în bucle</h3>
+      <pre><code><span class="kw">if</span> <span class="str">'bar'</span> <span class="kw">in</span> {<span class="str">'foo'</span>:<span class="num">1</span>, <span class="str">'bar'</span>:<span class="num">2</span>}:
+    <span class="fn">print</span>(<span class="num">1</span>)
+    <span class="fn">print</span>(<span class="num">2</span>)
+<span class="kw">if</span> <span class="str">'a'</span> <span class="kw">in</span> <span class="str">'qux'</span>:
+    <span class="fn">print</span>(<span class="num">3</span>)
+<span class="fn">print</span>(<span class="num">4</span>)
+<span class="cm"># Output: 1, 2, 4 ('a' nu e în 'qux', deci print(3) sărit)</span></code></pre>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('#nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+</body>
+</html>

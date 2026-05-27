@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSW — Pregătire Examen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.wrapper{max-width:800px;width:100%;}
+.title{font-size:36px;font-weight:700;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,var(--accent-light),#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sub{text-align:center;color:var(--text-muted);font-size:15px;margin-bottom:48px;}
+.section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:16px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:40px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-decoration:none;color:var(--text);transition:all .2s;display:block;}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.15);}
+.card-icon{font-size:28px;margin-bottom:12px;}
+.card-title{font-size:16px;font-weight:600;margin-bottom:6px;}
+.card-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-top:10px;border:1px solid;}
+.b-py{background:rgba(251,146,60,.1);color:#fdba74;border-color:rgba(251,146,60,.3);}
+.b-pd{background:rgba(56,189,248,.1);color:#7dd3fc;border-color:rgba(56,189,248,.3);}
+.b-st{background:rgba(255,75,75,.1);color:#fca5a5;border-color:rgba(255,75,75,.3);}
+.b-sa{background:rgba(52,211,153,.1);color:#6ee7b7;border-color:rgba(52,211,153,.3);}
+.b-gr{background:rgba(167,139,250,.1);color:#c4b5fd;border-color:rgba(167,139,250,.3);}
+.b-gen{background:rgba(245,158,11,.1);color:#fcd34d;border-color:rgba(245,158,11,.3);}
+.info-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-size:13px;color:var(--text-muted);text-align:center;}
+.info-bar strong{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <h1 class="title">Pregătire Examen PSW</h1>
+  <p class="sub">Pachete Software · Python · Pandas · Streamlit · SAS</p>
+
+  <div class="section-title">📖 Recapitulare Teorie</div>
+  <div class="grid">
+    <a href="recapitulare/python.html" class="card">
+      <div class="card-icon">🐍</div>
+      <div class="card-title">Python</div>
+      <div class="card-desc">Liste, tupluri, seturi, dicționare, funcții, scope, lambda, sortare, capcane frecvente</div>
+      <span class="badge b-py">PYTHON</span>
+    </a>
+    <a href="recapitulare/pandas.html" class="card">
+      <div class="card-icon">🐼</div>
+      <div class="card-title">Pandas</div>
+      <div class="card-desc">loc vs iloc ⚠️, merge, groupby, valori lipsă, describe, drop, apply/map, date, binning</div>
+      <span class="badge b-pd">PANDAS</span>
+    </a>
+    <a href="recapitulare/streamlit.html" class="card">
+      <div class="card-icon">🌊</div>
+      <div class="card-title">Streamlit</div>
+      <div class="card-desc">Model top-down ⚠️, session_state ⚠️, widget-uri, layout, callbacks, multi-page, quiz complet</div>
+      <span class="badge b-st">STREAMLIT</span>
+    </a>
+    <a href="recapitulare/sas.html" class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">SAS Programare</div>
+      <div class="card-desc">DATA step, SET/MERGE/APPEND, IN= ⚠️, WHERE vs IF ⚠️, PROC FORMAT, PUT vs INPUT ⚠️, ARRAY</div>
+      <span class="badge b-sa">SAS</span>
+    </a>
+  </div>
+
+  <div class="section-title">✏️ Grile Interactive</div>
+  <div class="grid">
+    <a href="grile/grile_extrase.html" class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Grile Extrase</div>
+      <div class="card-desc">~70 grile din examenele anterioare (Python, Pandas, Streamlit, SAS, Teorie) cu răspunsuri corecte și explicații. Shuffle disponibil.</div>
+      <span class="badge b-gr">70+ GRILE</span>
+    </a>
+    <a href="grile/grile_generate.html" class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">Grile Generate</div>
+      <div class="card-desc">200 grile generate din teorie cu răspunsuri + explicații de ce (50 per categorie). Shuffle complet — ordinea întrebărilor ȘI a răspunsurilor.</div>
+      <span class="badge b-gen">200+ GRILE</span>
+    </a>
+    <a href="grile/grile_noi_2026.html" class="card">
+      <div class="card-icon">🆕</div>
+      <div class="card-title">Grile Noi 2026</div>
+      <div class="card-desc">120 grile FRESH (24/categorie), cu întrebări diferite de celelalte fișiere — Python, Pandas, Streamlit, SAS, Teorie.</div>
+      <span class="badge b-gen">120 GRILE</span>
+    </a>
+  </div>
+
+  <div class="info-bar">
+    <strong>Examen:</strong> ~30 grile în 35 minute (~70 sec/întrebare) · 50% din nota finală ·
+    Accent pe: <strong>Python + Pandas + Streamlit + SAS programare</strong>
+  </div>
+</div>
+</body>
+</html>

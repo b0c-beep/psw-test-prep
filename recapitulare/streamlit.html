@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streamlit — Recapitulare PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--orange:#f97316;--blue:#3b82f6;--code-bg:#0d1117;--warn-bg:#2d2200;--warn-border:#f59e0b;--tip-bg:#002d1a;--tip-border:#10b981;--danger-bg:#2d0505;--danger-border:#ef4444;--info-bg:#001a2d;--info-border:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+#nav{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100;}
+#nav h2{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 20px 12px;}
+#nav a{display:block;padding:7px 20px;color:var(--text-muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .2s;}
+#nav a:hover,#nav a.active{color:var(--accent-light);border-left-color:var(--accent);background:rgba(99,102,241,.08);}
+#nav .section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;padding:16px 20px 4px;}
+#main{margin-left:260px;padding:40px 48px;max-width:960px;}
+.page-title{font-size:32px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#ff4b4b,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-sub{color:var(--text-muted);font-size:15px;margin-bottom:40px;}
+.section{margin-bottom:48px;scroll-margin-top:80px;}
+h2.sec-title{font-size:20px;font-weight:600;color:var(--accent-light);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px;}
+h3.sub-title{font-size:15px;font-weight:600;color:var(--text);margin:20px 0 10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;margin:12px 0;}
+code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre code{background:none;padding:0;color:var(--text);}
+.kw{color:#c084fc;}.fn{color:#38bdf8;}.str{color:#86efac;}.num{color:#fb923c;}.cm{color:#475569;}.var{color:#e2e8f0;}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.warn::before{content:"⚠️ ATENȚIE: ";font-weight:700;color:var(--yellow);}
+.tip{background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.tip::before{content:"✓ REȚINE: ";font-weight:700;color:var(--green);}
+.danger{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.danger::before{content:"✗ EROARE FRECVENTĂ: ";font-weight:700;color:var(--red);}
+.info{background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.info::before{content:"ℹ INFO: ";font-weight:700;color:var(--blue);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th{background:var(--surface2);color:var(--accent-light);padding:10px 14px;text-align:left;font-weight:600;border:1px solid var(--border);}
+td{padding:9px 14px;border:1px solid var(--border);}
+tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.widget-card{background:var(--surface2);border-radius:8px;padding:14px;border:1px solid var(--border);}
+.widget-card h4{font-size:12px;font-weight:700;color:var(--accent-light);margin-bottom:8px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;margin:2px;}
+.badge-input{background:rgba(99,102,241,.15);color:#c4b5fd;border:1px solid rgba(99,102,241,.3);}
+.badge-layout{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3);}
+.badge-display{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:900px){#nav{display:none;}#main{margin-left:0;padding:24px 20px;}}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <h2>PSW — Streamlit</h2>
+  <div class="section-label">Baze</div>
+  <a href="#intro">Intro & Pornire</a>
+  <a href="#model">Modelul de Execuție ⚠️</a>
+  <div class="section-label">Afisare</div>
+  <a href="#display">Funcții de Afișare</a>
+  <a href="#tables">Tabele</a>
+  <a href="#messages">Mesaje Colorate</a>
+  <div class="section-label">Input</div>
+  <a href="#input">Widget-uri Input</a>
+  <div class="section-label">Layout</div>
+  <a href="#layout">Sidebar & Coloane</a>
+  <a href="#tabs">Tabs & Expander</a>
+  <div class="section-label">Stare</div>
+  <a href="#session">Session State ⚠️</a>
+  <a href="#callbacks">Callbacks</a>
+  <div class="section-label">Avansat</div>
+  <a href="#multipage">Multi-page</a>
+  <a href="#charts">Grafice</a>
+  <div class="section-label">Quiz</div>
+  <a href="#quiz">Quiz Streamlit</a>
+</nav>
+
+<main id="main">
+  <h1 class="page-title">Streamlit — Recapitulare</h1>
+  <p class="page-sub">Framework web Python fără HTML/CSS/JS · Toate conceptele pentru examen</p>
+
+  <!-- ====== INTRO ====== -->
+  <section class="section" id="intro">
+    <h2 class="sec-title">Introducere & Pornire</h2>
+    <div class="card">
+      <p>Streamlit este un <strong>framework web Python</strong> care permite crearea de aplicații web <strong>fără HTML/CSS/JS</strong>. Aplicația este un fișier <code>.py</code> rulat de un server.</p>
+    </div>
+    <pre><code><span class="cm"># Import</span>
+<span class="kw">import</span> streamlit <span class="kw">as</span> st   <span class="cm"># convenție: alias 'st'</span>
+
+<span class="cm"># Configurare pagină (TREBUIE să fie primul apel st.*)</span>
+st.<span class="fn">set_page_config</span>(
+    page_title=<span class="str">"Aplicația Mea"</span>,
+    layout=<span class="str">"wide"</span>       <span class="cm"># sau "centered" (implicit)</span>
+)</code></pre>
+
+    <div class="warn">
+      Pornire aplicație: <code>streamlit run app.py</code> — NU <code>python app.py</code>, NU <code>streamlit start</code>.<br>
+      URL implicit: <code>http://localhost:8501</code>
+    </div>
+  </section>
+
+  <!-- ====== MODEL EXECUTIE ====== -->
+  <section class="section" id="model">
+    <h2 class="sec-title">⚠️ Modelul de Execuție TOP-DOWN</h2>
+    <div class="card" style="border-color:var(--yellow);">
+      <p style="font-size:15px;line-height:1.8;">La <strong>ORICE interacțiune</strong> a utilizatorului (click buton, mișcare slider, text input), Streamlit <strong>re-execută INTEGRAL scriptul de sus în jos</strong>.</p>
+      <ul style="margin-top:12px;margin-left:20px;line-height:2;">
+        <li>Variabilele simple se <strong>pierd</strong> la fiecare re-execuție</li>
+        <li>Ordinea codului = ordinea afișării elementelor</li>
+        <li>Nu există o "buclă web" manuală</li>
+        <li>Starea trebuie salvată în <code>st.session_state</code></li>
+      </ul>
+    </div>
+    <div class="danger">
+      La apăsarea <code>st.button("OK")</code>: <strong>întreg fișierul Python se re-execută de la început</strong> (nu doar blocul din if). Aplicația nu se închide.
+    </div>
+  </section>
+
+  <!-- ====== DISPLAY ====== -->
+  <section class="section" id="display">
+    <h2 class="sec-title">Funcții de Afișare</h2>
+    <pre><code>st.<span class="fn">title</span>(<span class="str">"Titlu Principal"</span>)       <span class="cm"># cel mai mare</span>
+st.<span class="fn">header</span>(<span class="str">"Header"</span>)
+st.<span class="fn">subheader</span>(<span class="str">"Subheader"</span>)
+st.<span class="fn">write</span>(<span class="str">"Text sau date"</span>)         <span class="cm"># universal — afișează orice</span>
+st.<span class="fn">markdown</span>(<span class="str">"**bold** _italic_"</span>)  <span class="cm"># suportă Markdown</span>
+st.<span class="fn">caption</span>(<span class="str">"Text mic"</span>)
+st.<span class="fn">text</span>(<span class="str">"Text monofonts"</span>)
+
+st.<span class="fn">code</span>(<span class="str">"x = 1 + 2"</span>, language=<span class="str">"python"</span>)  <span class="cm"># cod cu sintax highlighting</span>
+st.<span class="fn">latex</span>(r<span class="str">"\int_a^b f(x) dx"</span>)            <span class="cm"># formule LaTeX</span>
+
+st.<span class="fn">metric</span>(label=<span class="str">"Vânzări"</span>, value=<span class="str">"1,234"</span>, delta=<span class="str">"+5%"</span>)  <span class="cm"># indicator cu variație</span>
+st.<span class="fn">json</span>({"key": "value"})               <span class="cm"># obiect JSON</span></code></pre>
+  </section>
+
+  <!-- ====== TABELE ====== -->
+  <section class="section" id="tables">
+    <h2 class="sec-title">Afișare Tabele</h2>
+    <div class="grid2">
+      <div class="widget-card">
+        <h4>st.dataframe — INTERACTIV</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Scroll, sortare pe coloane. Acceptă DataFrame, liste de dicționare, etc.</p>
+        <pre style="margin:8px 0 0"><code>st.<span class="fn">dataframe</span>(df)</code></pre>
+      </div>
+      <div class="widget-card">
+        <h4>st.table — STATIC</h4>
+        <p style="font-size:13px;color:var(--text-muted);">Tabel fix, fără interactivitate.</p>
+        <pre style="margin:8px 0 0"><code>st.<span class="fn">table</span>(df)</code></pre>
+      </div>
+    </div>
+    <div class="widget-card" style="margin-top:12px;">
+      <h4>st.data_editor — EDITABIL</h4>
+      <p style="font-size:13px;color:var(--text-muted);">Utilizatorul poate edita valorile din tabel.</p>
+      <pre style="margin:8px 0 0"><code>st.<span class="fn">data_editor</span>(df)</code></pre>
+    </div>
+    <div class="warn">
+      <code>st.table</code> ≠ singurul mod de a afișa DataFrame. <code>st.dataframe</code> = interactiv, <code>st.data_editor</code> = editabil, <code>st.write(df)</code> funcționează de asemenea.
+    </div>
+  </section>
+
+  <!-- ====== MESSAGES ====== -->
+  <section class="section" id="messages">
+    <h2 class="sec-title">Mesaje Colorate</h2>
+    <pre><code>st.<span class="fn">success</span>(<span class="str">"Operație reușită!"</span>)    <span class="cm"># VERDE</span>
+st.<span class="fn">info</span>(<span class="str">"Informație"</span>)            <span class="cm"># ALBASTRU</span>
+st.<span class="fn">warning</span>(<span class="str">"Avertizare"</span>)        <span class="cm"># GALBEN</span>
+st.<span class="fn">error</span>(<span class="str">"Eroare!"</span>)             <span class="cm"># ROȘU</span>
+<span class="cm"># Diferența: culori diferite pentru niveluri de importanță</span></code></pre>
+    <table>
+      <tr><th>Funcție</th><th>Culoare</th><th>Utilizare</th></tr>
+      <tr><td><code>st.success()</code></td><td>🟢 Verde</td><td>Confirmare acțiune</td></tr>
+      <tr><td><code>st.info()</code></td><td>🔵 Albastru</td><td>Informații neutre</td></tr>
+      <tr><td><code>st.warning()</code></td><td>🟡 Galben</td><td>Avertizări</td></tr>
+      <tr><td><code>st.error()</code></td><td>🔴 Roșu</td><td>Erori</td></tr>
+    </table>
+  </section>
+
+  <!-- ====== INPUT ====== -->
+  <section class="section" id="input">
+    <h2 class="sec-title">Widget-uri Input</h2>
+    <div class="info">
+      Widget-urile de input <strong>returnează valori Python</strong> și controlează logica aplicației. NU sunt funcții de afișare.
+    </div>
+    <pre><code><span class="cm"># Butoane și text</span>
+<span class="kw">if</span> st.<span class="fn">button</span>(<span class="str">"Click me"</span>):          <span class="cm"># returnează True la click</span>
+    st.<span class="fn">write</span>(<span class="str">"Buton apăsat!"</span>)
+
+name = st.<span class="fn">text_input</span>(<span class="str">"Nume:"</span>)       <span class="cm"># returnează string</span>
+bio = st.<span class="fn">text_area</span>(<span class="str">"Biografie:"</span>)    <span class="cm"># text multi-linie</span>
+
+<span class="cm"># Numeric</span>
+age = st.<span class="fn">number_input</span>(<span class="str">"Vârstă:"</span>)
+age = st.<span class="fn">number_input</span>(<span class="str">"Vârstă:"</span>, min_value=<span class="num">0</span>, max_value=<span class="num">120</span>, value=<span class="num">25</span>)
+level = st.<span class="fn">slider</span>(<span class="str">"Level:"</span>, <span class="num">1</span>, <span class="num">10</span>, <span class="num">5</span>)  <span class="cm"># min, max, default</span>
+
+<span class="cm"># Selecție</span>
+opt = st.<span class="fn">selectbox</span>(<span class="str">"Alege:"</span>, [<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>])     <span class="cm"># O singură opțiune</span>
+opts = st.<span class="fn">multiselect</span>(<span class="str">"Alege:"</span>, [<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>])  <span class="cm"># Mai multe opțiuni → returnează LISTĂ</span>
+gen = st.<span class="fn">radio</span>(<span class="str">"Gen:"</span>, [<span class="str">"M"</span>, <span class="str">"F"</span>])                  <span class="cm"># Radio buttons</span>
+ok = st.<span class="fn">checkbox</span>(<span class="str">"Accept termenii"</span>)               <span class="cm"># True/False</span>
+
+<span class="cm"># Dată</span>
+data = st.<span class="fn">date_input</span>(<span class="str">"Data:"</span>)
+fisier = st.<span class="fn">file_uploader</span>(<span class="str">"Încarcă fișier:"</span>)</code></pre>
+
+    <div class="warn">
+      <code>st.multiselect</code> fără nicio selecție returnează o <strong>listă goală</strong> <code>[]</code>, nu <code>None</code>.
+    </div>
+
+    <table>
+      <tr><th>Widget</th><th>Tip</th><th>Returnează</th></tr>
+      <tr><td><code>st.button()</code></td><td><span class="badge badge-input">INPUT</span></td><td>True la click</td></tr>
+      <tr><td><code>st.text_input()</code></td><td><span class="badge badge-input">INPUT</span></td><td>string</td></tr>
+      <tr><td><code>st.number_input()</code></td><td><span class="badge badge-input">INPUT</span></td><td>număr</td></tr>
+      <tr><td><code>st.slider()</code></td><td><span class="badge badge-input">INPUT</span></td><td>număr sau interval</td></tr>
+      <tr><td><code>st.selectbox()</code></td><td><span class="badge badge-input">INPUT</span></td><td>o valoare</td></tr>
+      <tr><td><code>st.multiselect()</code></td><td><span class="badge badge-input">INPUT</span></td><td>listă ([] dacă gol)</td></tr>
+      <tr><td><code>st.radio()</code></td><td><span class="badge badge-input">INPUT</span></td><td>valoarea selectată</td></tr>
+      <tr><td><code>st.checkbox()</code></td><td><span class="badge badge-input">INPUT</span></td><td>True/False</td></tr>
+      <tr><td><code>st.write()</code></td><td><span class="badge badge-display">AFIȘARE</span></td><td>—</td></tr>
+      <tr><td><code>st.table()</code></td><td><span class="badge badge-display">AFIȘARE</span></td><td>—</td></tr>
+    </table>
+  </section>
+
+  <!-- ====== LAYOUT ====== -->
+  <section class="section" id="layout">
+    <h2 class="sec-title">Sidebar & Coloane</h2>
+    <pre><code><span class="cm"># Sidebar — bara laterală</span>
+st.<span class="fn">sidebar</span>.write(<span class="str">"În sidebar"</span>)
+section = st.<span class="fn">sidebar</span>.<span class="fn">radio</span>(<span class="str">"Navigare:"</span>, [<span class="str">"Home"</span>, <span class="str">"Settings"</span>, <span class="str">"Result"</span>])
+<span class="kw">with</span> st.<span class="fn">sidebar</span>:
+    st.<span class="fn">title</span>(<span class="str">"Meniu"</span>)
+
+<span class="cm"># Coloane</span>
+col1, col2 = st.<span class="fn">columns</span>(<span class="num">2</span>)
+<span class="kw">with</span> col1:
+    st.<span class="fn">write</span>(<span class="str">"Coloana stânga"</span>)
+<span class="kw">with</span> col2:
+    st.<span class="fn">write</span>(<span class="str">"Coloana dreapta"</span>)
+
+<span class="cm"># Coloane cu proporții diferite</span>
+col1, col2, col3 = st.<span class="fn">columns</span>([<span class="num">2</span>, <span class="num">1</span>, <span class="num">1</span>])</code></pre>
+
+    <div class="danger">
+      <code>st.slider</code> = widget de <strong>INPUT</strong>, NU de layout! Elementele de layout sunt: <code>sidebar</code>, <code>columns</code>, <code>expander</code>, <code>tabs</code>.
+    </div>
+  </section>
+
+  <!-- ====== TABS EXPANDER ====== -->
+  <section class="section" id="tabs">
+    <h2 class="sec-title">Tabs & Expander</h2>
+    <pre><code><span class="cm"># Tabs</span>
+tab1, tab2 = st.<span class="fn">tabs</span>([<span class="str">"Tab 1"</span>, <span class="str">"Tab 2"</span>])
+<span class="kw">with</span> tab1:
+    st.<span class="fn">write</span>(<span class="str">"Conținut Tab 1"</span>)
+<span class="kw">with</span> tab2:
+    st.<span class="fn">write</span>(<span class="str">"Conținut Tab 2"</span>)
+
+<span class="cm"># Expander — secțiune colapsabilă</span>
+<span class="kw">with</span> st.<span class="fn">expander</span>(<span class="str">"Detalii avansate"</span>):
+    st.<span class="fn">write</span>(<span class="str">"Conținut ascuns implicit"</span>)</code></pre>
+  </section>
+
+  <!-- ====== SESSION STATE ====== -->
+  <section class="section" id="session">
+    <h2 class="sec-title">⚠️ Session State</h2>
+    <div class="card" style="border-color:var(--yellow);">
+      <p><code>st.session_state</code> este un <strong>dicționar</strong> care păstrează valori <strong>între re-execuțiile scriptului</strong>.</p>
+    </div>
+
+    <h3 class="sub-title">Comportament</h3>
+    <table>
+      <tr><th>Afirmație</th><th>Adevărat?</th></tr>
+      <tr><td>Este un dicționar ce păstrează valori între re-execuții</td><td>✅ ADEVĂRAT</td></tr>
+      <tr><td>Poate memora numărul de click-uri</td><td>✅ ADEVĂRAT</td></tr>
+      <tr><td>Poate reține obiecte (ex. DataFrame)</td><td>✅ ADEVĂRAT</td></tr>
+      <tr><td>Se golește automat la fiecare apăsare de buton</td><td>❌ FALS — NU se golește automat</td></tr>
+    </table>
+
+    <pre><code><span class="cm"># Inițializare</span>
+<span class="kw">if</span> <span class="str">"counter"</span> <span class="kw">not in</span> st.<span class="fn">session_state</span>:
+    st.<span class="fn">session_state</span>.counter = <span class="num">0</span>
+
+<span class="cm"># Modificare cu callback</span>
+<span class="kw">def</span> <span class="fn">increment</span>():
+    st.<span class="fn">session_state</span>.counter += <span class="num">1</span>
+
+st.<span class="fn">button</span>(<span class="str">"Click"</span>, on_click=increment)
+st.<span class="fn">write</span>(<span class="str">f"Clicks: {st.session_state.counter}"</span>)
+
+<span class="cm"># Variabilele simple se pierd la re-execuție!</span>
+count = <span class="num">0</span>        <span class="cm"># se resetează la 0 de fiecare dată</span>
+count += <span class="num">1</span>       <span class="cm"># NU funcționează ca numărător persistent</span></code></pre>
+  </section>
+
+  <!-- ====== CALLBACKS ====== -->
+  <section class="section" id="callbacks">
+    <h2 class="sec-title">Callbacks</h2>
+    <pre><code><span class="cm"># on_click — buton</span>
+<span class="kw">def</span> <span class="fn">on_click_fn</span>():
+    st.<span class="fn">session_state</span>.value = <span class="str">"schimbat"</span>
+
+st.<span class="fn">button</span>(<span class="str">"OK"</span>, on_click=on_click_fn)
+
+<span class="cm"># on_click cu argumente</span>
+<span class="kw">def</span> <span class="fn">adauga</span>(n):
+    st.<span class="fn">session_state</span>.total += n
+
+st.<span class="fn">button</span>(<span class="str">"Adaugă 5"</span>, on_click=adauga, args=(<span class="num">5</span>,))
+
+<span class="cm"># on_change — selectbox, text_input etc.</span>
+st.<span class="fn">selectbox</span>(<span class="str">"Opt:"</span>, opts, on_change=callback, key=<span class="str">"sel"</span>)</code></pre>
+  </section>
+
+  <!-- ====== MULTIPAGE ====== -->
+  <section class="section" id="multipage">
+    <h2 class="sec-title">Multi-page Apps</h2>
+    <pre><code><span class="cm"># Structură foldere:</span>
+<span class="cm"># app.py            (pagina principală)</span>
+<span class="cm"># pages/</span>
+<span class="cm">#   1_Introducere.py</span>
+<span class="cm">#   2_Analiza.py</span>
+<span class="cm">#   3_Rezultate.py</span>
+
+<span class="cm"># Streamlit detectează automat folderul 'pages/'</span>
+<span class="cm"># și afișează paginile în sidebar</span></code></pre>
+  </section>
+
+  <!-- ====== CHARTS ====== -->
+  <section class="section" id="charts">
+    <h2 class="sec-title">Grafice</h2>
+    <pre><code><span class="cm"># Grafice native Streamlit</span>
+st.<span class="fn">line_chart</span>(data)
+st.<span class="fn">bar_chart</span>(data)
+st.<span class="fn">area_chart</span>(data)
+
+<span class="cm"># Matplotlib</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+fig, ax = plt.<span class="fn">subplots</span>()
+ax.<span class="fn">plot</span>(x, y)
+st.<span class="fn">pyplot</span>(fig)
+
+<span class="cm"># Altair / Plotly</span>
+st.<span class="fn">altair_chart</span>(chart)
+st.<span class="fn">plotly_chart</span>(fig)</code></pre>
+  </section>
+
+  <!-- ====== QUIZ ====== -->
+  <section class="section" id="quiz">
+    <h2 class="sec-title">✔️ Quiz Streamlit — Răspunsuri Corecte</h2>
+    <div class="card">
+      <table>
+        <tr><th>Întrebare</th><th>Răspuns Corect</th><th>Greșeli Frecvente</th></tr>
+        <tr>
+          <td>Cum pornești app.py?</td>
+          <td><code>streamlit run app.py</code></td>
+          <td>❌ python app.py</td>
+        </tr>
+        <tr>
+          <td>Cum imporți?</td>
+          <td><code>import streamlit as st</code></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Configurare pagină layout</td>
+          <td><code>layout="wide"</code> sau <code>"centered"</code></td>
+          <td>Ambele sunt valide</td>
+        </tr>
+        <tr>
+          <td>Funcții de INPUT</td>
+          <td><code>st.text_input</code>, <code>st.slider</code></td>
+          <td>❌ st.write și st.table sunt AFIȘARE</td>
+        </tr>
+        <tr>
+          <td>Tabel INTERACTIV</td>
+          <td><code>st.dataframe</code></td>
+          <td>❌ st.table = static</td>
+        </tr>
+        <tr>
+          <td>Widget-uri SELECȚIE</td>
+          <td>selectbox, multiselect, checkbox</td>
+          <td>❌ st.code = afișare, nu selecție</td>
+        </tr>
+        <tr>
+          <td>session_state se golește la buton?</td>
+          <td>❌ NU se golește automat</td>
+          <td>Afirmație FALSĂ la examen</td>
+        </tr>
+        <tr>
+          <td>st.button apăsat → ce se întâmplă?</td>
+          <td>Întreg scriptul se RE-EXECUTĂ</td>
+          <td>❌ Nu se execută doar blocul</td>
+        </tr>
+        <tr>
+          <td>Elemente de LAYOUT</td>
+          <td>sidebar, columns, expander</td>
+          <td>❌ st.slider = INPUT, nu layout!</td>
+        </tr>
+        <tr>
+          <td>multiselect gol</td>
+          <td>Returnează <code>[]</code> (listă goală)</td>
+          <td>❌ Nu returnează None</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('#nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>

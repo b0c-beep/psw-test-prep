@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grile Noi 2026 — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:18px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ctrl-btn.primary:hover{background:#4f46e5;}
+#stats{display:flex;gap:12px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;}
+#stats span{background:var(--surface2);padding:3px 10px;border-radius:20px;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#container{max-width:800px;margin:0 auto;padding:28px 20px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn:hover{border-color:var(--accent);}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;transition:border-color .2s;}
+.q-card.answered{border-color:var(--border);}
+.q-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-python{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3);}
+.cat-pandas{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3);}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.cat-teorie{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre.q-code{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);margin:8px 0 12px;line-height:1.6;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.selected{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-text{font-size:13px;line-height:1.5;}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#a7f3d0;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:32px;font-weight:700;color:var(--accent-light);}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>Grile Noi 2026 — PSW</h1>
+  <div id="stats">
+    <span id="total-count">120 grile</span>
+    <span style="color:var(--green)" id="correct-count">✓ 0</span>
+    <span style="color:var(--red)" id="wrong-count">✗ 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleAll()">🔀 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">↺ Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">👁 Răspunsuri</button>
+</div>
+<div id="container">
+  <div id="score-box"><h2 id="score-text">0/0</h2><p id="score-pct" style="color:var(--text-muted);margin-top:6px;"></p></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('python',this)">Python</button>
+    <button class="filter-btn" onclick="filterCat('pandas',this)">Pandas</button>
+    <button class="filter-btn" onclick="filterCat('streamlit',this)">Streamlit</button>
+    <button class="filter-btn" onclick="filterCat('sas',this)">SAS</button>
+    <button class="filter-btn" onclick="filterCat('teorie',this)">Teorie</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+<script>
+const questions = [
+// ===== PYTHON (24 grile) =====
+{cat:"python",text:"Ce afișează următorul cod?<pre class='q-code'>x = 10\ndef f():\n    global x\n    x = 5\nf()\nprint(x)</pre>",opts:["10","5","Eroare — global nu poate fi folosit în interiorul funcției","15"],correct:1,ex:"Instrucțiunea 'global x' în interiorul funcției declară că x este variabila GLOBALĂ. x = 5 modifică variabila globală. print(x) = 5."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>a = dict([('a',1), ('b',2)])\nprint(a.get('c', 'default'))</pre>",opts:["Eroare TypeError","None","'default'","1"],correct:2,ex:"dict() poate fi construit dintr-o listă de perechi. get('c', 'default') returnează 'default' deoarece cheia 'c' nu există."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>s = {1, 2, 3}\ns.update([3, 4, 5])\nprint(len(s))</pre>",opts:["3","5","6","8"],correct:1,ex:"Set.update() adaugă elemente MULTIPLE (dintr-o listă) la set. Setul conține {1,2,3,4,5} — 5 elemente unice."},
+{cat:"python",text:"Ce face următoarea linie de cod?<pre class='q-code'>z = zip([1,2,3], ['a','b'])</pre>",opts:["Eroare — liste de lungimi diferite","Perechi (1,'a'), (2,'b')","Perechi (1,'a'), (2,'b'), (3, None)","Perechi (1,'a'), (2,'b') — zip se oprește la cea mai scurtă listă"],correct:3,ex:"zip() NU generează eroare la lungimi diferite. Se oprește la sfârșitul celei mai SCURTE liste. 3 nu este paired, deci perechile sunt (1,'a'), (2,'b')."},
+{cat:"python",text:"Cum verifici dacă un string '123' conține DOAR cifre?",opts:["'123'.isdigit()","'123'.isnumeric()","'123'.isdecimal()","Toate cele de mai sus"],correct:3,ex:"Toate trei metodele (.isdigit(), .isnumeric(), .isdecimal()) returnează True pentru stringul '123'. Diferențe apar la caractere speciale (ex: ², ½)."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>a = [1, 2, 3]\nb = a[:]\nb.append(4)\nprint(a, b)</pre>",opts:["[1,2,3,4] [1,2,3,4]","[1,2,3] [1,2,3,4]","Eroare","[1,2,3] [1,2,3]"],correct:1,ex:"a[:] (slicing total) creează o COPIE SHALLOW a listei. b este un obiect separat; b.append(4) nu modifică pe a."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>def func(a, b=[]):\n    b.append(a)\n    return b\nprint(func(1))\nprint(func(2))</pre>",opts:["[1] [1,2]","[1] [2]","Eroare","[1] [1]"],correct:0,ex:"Valoarea implicită b=[] este EVALUATĂ O SINGURĂ DATĂ la definirea funcției (nu la fiecare apel). La primul apel b=[1]. La al doilea apel, b este ACEEAȘI listă [1], apoi append(2) → [1,2]."},
+{cat:"python",text:"Care afirmație despre decoratori în Python este corectă?",opts:["Decorează doar funcții fără parametri","Sunt funcții care MODIFICĂ comportamentul altei funcții","Se aplică cu sintaxa @decorator() (paranteze obligatorii)","Nu pot fi înlănțuiți"],correct:1,ex:"Decoratorii sunt funcții care înfășoară (wrap) alte funcții pentru a le extinde comportamentul. Se aplică cu @nume (fără paranteze dacă nu are parametri)."},
+{cat:"python",text:"Ce face context manager-ul with open('f.txt') as f:?",opts:["Deschide fișierul și trebuie închis manual","Deschide fișierul și îl ÎNCHIDE AUTOMAT la ieșirea din bloc","Doar verifică dacă fișierul există","Citește întreg fișierul"],correct:1,ex:"Context manager (with) asigură închiderea AUTOMATĂ a fișierului la ieșirea din bloc (inclusiv la excepție). Nu necesită f.close() manual."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print(0.1 + 0.2 == 0.3)</pre>",opts:["True","False","Eroare","None"],correct:1,ex:"0.1 + 0.2 = 0.30000000000000004 din cauza reprezentării în virgulă mobilă (IEEE 754). Comparația 0.1 + 0.2 == 0.3 returnează False."},
+{cat:"python",text:"Ce face funcția super() în Python?",opts:["Termină execuția programului","Salvează variabilele","Apelează metoda PĂRINTELUI (clasei de bază)","Creează o super-variabilă"],correct:2,ex:"super() returnează un obiect proxy care permite apelarea metodelor clasei PĂRINTE (base class). Folosit în moștenire (OOP)."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print(all([True, True, False]))</pre>",opts:["True","False","Eroare","None"],correct:1,ex:"all() returnează True DOAR dacă TOATE elementele sunt adevărate. False → cel puțin un element e fals. any() returnează True dacă cel puțin unul e adevărat."},
+{cat:"python",text:"Care este rezultatul expresiei?<pre class='q-code'>3 * 'ab' + 'cd'</pre>",opts:["'abababcd'","'3abcd'","Eroare","'ab3cd'"],correct:0,ex:"* pe string = repetiție. 'ab' * 3 = 'ababab'. + = concatenare. 'ababab' + 'cd' = 'abababcd'."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>import copy\na = [1, [2, 3]]\nb = copy.deepcopy(a)\nb[1][0] = 99\nprint(a[1][0])</pre>",opts:["99","2","Eroare","None"],correct:1,ex:"deepcopy() creează o copie complet independentă (recursivă). b[1][0] = 99 nu modifică lista interioară din a. a[1][0] rămâne 2."},
+{cat:"python",text:"Ce este un generator în Python?",opts:["O funcție care returnează o listă","O funcție cu yield care produce valori LA CERERE (lazy evaluation)","Un tip de date","O clasă specială"],correct:1,ex:"Generator = funcție cu 'yield' în loc de 'return'. Produce valori LA CERERE (lazy). Nu stochează toate valorile în memorie deodată."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>x = [1, 2, 3]\ny = x\nx = x + [4]\nprint(y)</pre>",opts:["[1,2,3,4]","[1,2,3]","Eroare","[4]"],correct:1,ex:"x + [4] creează o listă NOUĂ și o atribuie lui x. y încă referă lista originală [1,2,3]. Spre deosebire de x += [4] care ar modifica in-place și ar afecta și pe y."},
+{cat:"python",text:"Ce face setdefault() la un dicționar?",opts:["Șterge cheia","Returnează valoarea pentru cheie sau INSEREAZĂ o valoare implicită dacă cheia nu există","Verifică dacă cheia există","Adună valorile"],correct:1,ex:"d.setdefault('cheie', default) returnează valoarea pentru 'cheie'. Dacă 'cheie' nu există, INSEREAZĂ 'cheie': default și returnează default."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>nums = [1, 2, 3, 4, 5]\nnums[1:4] = [10, 20]\nprint(nums)</pre>",opts:["[1,10,20,4,5]","[1,10,20,5]","[10,20,5]","Eroare"],correct:1,ex:"Slicing assignment înlocuiește slice-ul cu o listă de lungime posibil diferită. nums[1:4] = elementele de pe pozițiile 1,2,3. Sunt înlocuite cu [10,20] (2 elemente în loc de 3). Rezultat: [1,10,20,5]."},
+{cat:"python",text:"Ce reprezintă __init__ într-o clasă Python?",opts:["O metodă statică","CONSTRUCTORUL — apelată la crearea unei instanțe","Destructorul","O metodă privată"],correct:1,ex:"__init__ este constructorul clasei — apelată AUTOMAT când se creează o nouă instanță (obiect). Inițializează atributele."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print(~5)</pre>",opts:["-5","-6","4","Eroare"],correct:1,ex:"~x = complement față de 1 (bitwise NOT) = -x-1. ~5 = -6. În binar: 5 = 0101, ~5 = 1010 = -6 (complement față de 2)."},
+{cat:"python",text:"Cum se gestionează MULTIPLE excepții cu un singur bloc except?",opts:["except ValueError, TypeError:","except (ValueError, TypeError):","except ValueError & TypeError:","except ValueError or TypeError:"],correct:1,ex:"Sintaxa corectă: except (ValueError, TypeError): pentru a prinde multiple tipuri de excepții cu același handler."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>def gen():\n    yield 1\n    yield 2\n    yield 3\ng = gen()\nprint(next(g))\nprint(next(g))\nprint(next(g))\nprint(next(g))</pre>",opts:["1 2 3 4","1 2 3 Eroare (StopIteration)","1 1 1 1","Eroare la primul next"],correct:1,ex:"Generatorul produce 1, 2, 3. La al 4-lea next(), nu mai există elemente → StopIteration."},
+{cat:"python",text:"Care este diferența dintre remove() și pop() pe o listă?",opts:["Nu există diferență","remove() șterge elementul cu valoarea dată; pop() șterge elementul de la indexul dat (și îl returnează)","remove() șterge ultimul; pop() primul","remove() returnează elementul; pop() nu"],correct:1,ex:"list.remove(val) șterge PRIMUL element cu valoarea val (nu returnează nimic). list.pop(index) șterge elementul de la index (returnează valoarea)."},
+{cat:"python",text:"Ce afișează?<pre class='q-code'>print('{0:.2f}'.format(3.14159))</pre>",opts:["'3.14159'","'3.14'","'3.142'","Eroare"],correct:1,ex:"Format string '{0:.2f}' specifică 2 zecimale. 3.14159 → '3.14' (nu rotunjește la '3.142' — .2f trunchiază la 2 zecimale)."},
+
+// ===== PANDAS (24 grile) =====
+{cat:"pandas",text:"Ce face df.rename(columns={'A':'X'}) în lipsa inplace=True?",opts:["Modifică df permanent","Returnează un NOU DataFrame — originalul rămâne neschimbat","Eroare","Șterge coloana A"],correct:1,ex:"Implicit, rename() (și majoritatea metodelor pandas) returnează un NOU obiect. Dacă nu folosești inplace=True, originalul NU e modificat."},
+{cat:"pandas",text:"Ce returnează df.index în pandas?",opts:["Lista valorilor din prima coloană","Indexul (etichetele rândurilor) — immutable, poate fi RangeIndex, DatetimeIndex etc.","Numărul de rânduri","Tipurile coloanelor"],correct:1,ex:"df.index returnează un obiect Index care conține etichetele rândurilor. Poate fi RangeIndex (0,1,2...), DatetimeIndex, MultiIndex etc."},
+{cat:"pandas",text:"Cum se creează o coloană condițională cu np.where?<pre class='q-code'>df['Cat'] = np.where(df['Nota'] >= 5, 'Promovat', 'Respins')</pre>",opts:["Eroare — np.where nu există","Atribuie 'Promovat' dacă Nota>=5, altfel 'Respins'","Calculează media","Șterge coloana Nota"],correct:1,ex:"np.where(condiție, val_dacă_da, val_dacă_nu) este o metodă eficientă pentru crearea de coloane condiționale în pandas."},
+{cat:"pandas",text:"Ce face df.sort_index()?",opts:["Sortează după VALORILE INDEXULUI (etichetele rândurilor)","Sortează după prima coloană","Sortează coloanele","Resetează indexul"],correct:0,ex:"sort_index() sortează DataFrame-ul pe baza valorilor indexului (etichetelor). sort_values() sortează pe baza valorilor unei coloane."},
+{cat:"pandas",text:"Ce face pd.crosstab(df['Regiune'], df['Categorie'])?",opts:["Un tabel de frecvență încrucișată (cross-tabulation)","O pivotare","Un merge","O concatenare"],correct:0,ex:"pd.crosstab() creează un tabel de frecvență încrucișată (cross-tabulation) — numără combinațiile dintre două coloane. Similar cu pivot_table dar specializat pentru frecvențe."},
+{cat:"pandas",text:"Ce face df['nota'].between(5, 10)?",opts:["Verifică dacă nota e STRICT între 5 și 10","Verifică dacă nota e în INTERVALUL [5, 10] (inclusiv capetele)","Verifică dacă nota e între 5 și 10 exclusiv","Sortează valorile între 5 și 10"],correct:1,ex:"Series.between(left, right, inclusive='both') (implicit inclusiv la ambele capete). Returnează mască booleană."},
+{cat:"pandas",text:"Ce face df['col'].shift(1)?",opts:["Deplasează coloana în jos cu 1 poziție (apare valoarea din rândul anterior)","Deplasează coloana la stânga","Sortează coloana","Transformă coloana în date"],correct:0,ex:"shift(n) deplasează valorile cu n poziții. shift(1) = valoarea din rândul anterior (lag). shift(-1) = rândul următor (lead). Util pentru diferențe."},
+{cat:"pandas",text:"Ce face df['col'].rolling(3).mean()?",opts:["Media primelor 3 valori","Media MOBILĂ (fereastră de 3) — pentru fiecare rând, media lui și a 2 precedente","Media ultimelor 3 valori","Media coloanei"],correct:1,ex:"rolling(3).mean() calculează media mobilă pe o fereastră de 3 observații. rolling(n) = fereastră glisantă de dimensiune n."},
+{cat:"pandas",text:"Cum se verifică dacă o coloană are valori DUPLICATE (ignorând prima apariție)?",opts:["df['col'].duplicated()","df['col'].duplicated(keep='first')","df['col'].is_duplicate()","df.duplicates('col')"],correct:0,ex:"duplicated() returnează True pentru duplicate (începând cu a doua apariție). keep='first' (implicit) marchează prima ca False, restul True. keep=False marchează TOATE ca True."},
+{cat:"pandas",text:"Ce face df['Data'].dt.year când coloana este datetime?",opts:["Returnează anul ca întreg (ex: 2024)","Returnează anul ca string","Returnează numărul de ani de la 1970","Eroare — dt nu e accesibil"],correct:0,ex:"df['Data'].dt.oferă acces la componentele datei după conversia cu pd.to_datetime(). .year = anul, .month = luna, .day = ziua."},
+{cat:"pandas",text:"Ce face df.explode('Categorii') dacă Categorii conține liste?",opts:["Elimină coloana cu liste","Creează câte un rând pentru fiecare element din listă (restul coloanelor se repetă)","Transformă listele în stringuri","Calculează lungimea listelor"],correct:1,ex:"explode() transformă fiecare element al unei liste dintr-o celulă în rând SEPARAT. Celelalte coloane se repetă. Util pentru date cu structuri nested."},
+{cat:"pandas",text:"Ce face df[df > 10] pe un DataFrame numeric?",opts:["Filtrează rândurile cu valori > 10","Returnează DataFrame cu NaN unde valoarea <=10","Șterge rândurile cu valori <=10","Eroare"],correct:1,ex:"Masca booleană pe întreg DataFrame-ul returnează un DataFrame de aceeași dimensiune cu NaN (sau False) unde condiția e falsă."},
+{cat:"pandas",text:"Ce face df['col'].str.contains('abc', na=False)?",opts:["Verifică dacă 'abc' e în fiecare șir; na=False tratează NaN ca False","Verifică dacă 'abc' e în numele coloanei","Caută 'abc' în index","Eroare"],correct:0,ex:"str.contains() verifică dacă subșirul e conținut. na=False → valorile lipsă (NaN) sunt tratate ca False (nu generează NaN)."},
+{cat:"pandas",text:"Cum se salvează un DataFrame în Excel cu mai multe foi?",opts:["Excelează cu pd.to_excel('f.xlsx', sheet_name=['F1','F2'])","Se salvează doar o foaie","Cu pd.ExcelWriter: writer = pd.ExcelWriter('f.xlsx'); df1.to_excel(writer, 'F1'); df2.to_excel(writer, 'F2'); writer.close()","Nu se poate"],correct:2,ex:"pd.ExcelWriter permite scrierea mai multor foi (sheet-uri) în același fișier Excel. Se apelează to_csv, to_excel pentru fiecare DataFrame."},
+{cat:"pandas",text:"Ce face df['col'].value_counts(normalize=True)?",opts:["Numără valorile și returnează FRECVENȚE RELATIVE (procente 0-1)","Normalizează valorile la intervalul [0,1]","Sortează descrescător"," Șterge valorile rare"],correct:0,ex:"normalize=True returnează frecvențe relative (suma = 1.0). Fără normalize, returnează numărarea absolută."},
+{cat:"pandas",text:"Ce face df.stack() pe un DataFrame multi-index pe coloane?",opts:["Elimină indexul","Transformă coloanele în RÂNDURI (long format)","Transformă rândurile în coloane","Sortează"],correct:1,ex:"stack() 'îngrămădește' coloanele în rânduri → convertește din wide în long format. unstack() face invers (long → wide)."},
+{cat:"pandas",text:"Cum se citește un fișier CSV cu separator ';' și codare UTF-8?",opts:["pd.read('f.csv', sep=';', encoding='utf-8')","pd.read_csv('f.csv', sep=';', encoding='utf-8')","pd.read_csv('f.csv', delimiter=';', encoding='UTF8')","Ambele b și c"],correct:3,ex:"Atât sep= (alias) cât și delimiter= sunt valabile. encoding='utf-8' (sau 'UTF-8') specifică codarea."},
+{cat:"pandas",text:"Ce face df['A'] = pd.to_numeric(df['A'], errors='coerce')?",opts:["Convertește la numeric; valorile neconvertibile devin NaN","Convertește la numeric; eroare la valori neconvertibile","Convertește la int","Șterge coloana"],correct:0,ex:"to_numeric() cu errors='coerce' FORȚEAZĂ conversia la numeric. Valorile care nu pot fi convertite (ex: text) devin NaN."},
+{cat:"pandas",text:"Ce este un MultiIndex în pandas?",opts:["Un index numeric","Un index cu mai multe niveluri (ierarhic) pe rânduri sau coloane","Un index cu valori duplicate","Un index pe mai multe coloane"],correct:1,ex:"MultiIndex (sau Hierarchical Index) permite indexarea pe mai multe niveluri — atât pe rânduri cât și pe coloane. Creat cu pd.MultiIndex.from_tuples()."},
+{cat:"pandas",text:"Ce face df.xs('cheie', level='nivel') pe un DataFrame cu MultiIndex?",opts:["Caută 'cheie' în toate coloanele","Selectează RÂNDURILE care au 'cheie' la nivelul specificat","Șterge rânduri cu 'cheie'","Creează un subset"],correct:1,ex:"xs() (cross-section) selectează rânduri/coloane la un nivel specific din MultiIndex. level= specifică nivelul, 'cheie' = valoarea căutată."},
+{cat:"pandas",text:"Ce afișează?<pre class='q-code'>df = pd.DataFrame({'x': [1, 2, 3]}, index=['a', 'b', 'c'])\nprint(df.loc['b':'c'])</pre>",opts:["Rândurile 'b' și 'c' (INCLUSIV ambele capete)","Rândurile 'b' și 'c' (EXCLUSIV 'c')","Eroare","Rândul 'b'"],correct:0,ex:"loc cu etichete: slicing INCLUSIV la AMBELE capete. 'b':'c' include ambele rânduri — 'b' și 'c'."},
+{cat:"pandas",text:"Cum se înlocuiește o valoare specifică în pandas?",opts:["df['col'].replace(0, None)","df['col'].replace({0: None})","df['col'].replace(0, pd.NA)","Toate cele de mai sus sunt valide"],correct:3,ex:"replace() acceptă multiple forme: valoare_veche, valoare_nouă sau dicționar {veche: nouă}. Poți înlocui cu None sau pd.NA."},
+{cat:"pandas",text:"Ce face pd.api.types.is_numeric_dtype(df['col'])?",opts:["Verifică dacă coloana e numerică","Setează coloana ca numerică","Calculează media","Eroare — apel incorect"],correct:0,ex:"pd.api.types.is_numeric_dtype() returnează True dacă coloana e de tip numeric (int, float). Util pentru a verifica tipul dinamic."},
+{cat:"pandas",text:"Cum se selectează un subset de coloane dintr-un DataFrame după tip?",opts:["df.select_dtypes(include=['int64', 'float64'])","df.types(['int64'])","df.get_dtypes('numeric')","df.filter(type='numeric')"],correct:0,ex:"select_dtypes() selectează coloanele cu tipuri specifice. include= lista tipurilor de inclus. exclude= lista tipurilor de exclus."},
+
+// ===== STREAMLIT (24 grile) =====
+{cat:"streamlit",text:"Cum se inițializează corect o cheie în session_state?",opts:["st.session_state.counter = 0","if 'counter' not in st.session_state: st.session_state.counter = 0","st.session_state['counter'] = 0 (orice linie)","Se inițializează automat"],correct:1,ex:"Trebuie verificat întâi cu 'if \"cheie\" not in st.session_state' pentru a evita RESETAREA valorii la fiecare rerun. Inițializarea directă ar reseta counter-ul de fiecare dată."},
+{cat:"streamlit",text:"Ce face st.download_button în Streamlit?",opts:["Descarcă un fișier de pe internet","Creează un buton care permite descărcarea unui fișier GENERAT (ex: CSV)","Trimite date la server","Deschide un link de download"],correct:1,ex:"st.download_button(label, data, file_name='f.csv', mime='text/csv') permite descărcarea datelor generate în aplicație (csv, json, imagine etc.)."},
+{cat:"streamlit",text:"Cum se afișează un JSON frumos formatat?",opts:["st.json(dict_data)","st.show_json(dict_data)","st.write_json(dict_data)","st.pretty(dict_data)"],correct:0,ex:"st.json() afișează un obiect JSON cu indentare și evidențiere ierarhică. st.write() afișează dict-ul dar fără formatare specifică JSON."},
+{cat:"streamlit",text:"Ce face st.columns([3, 1, 2])?",opts:["Eroare — trebuie număr întreg","Creează 3 coloane cu lățimi proporționale 3:1:2","Creează 3 coloane cu lățimi fixe 3px, 1px, 2px","Creează 6 coloane (suma)"],correct:1,ex:"st.columns([3,1,2]) creează 3 coloane cu proporțiile 3:1:2. Fiecare coloană primește (3/6), (1/6), (2/6) din lățime."},
+{cat:"streamlit",text:"Care este efectul st.toast('Mesaj')?",opts:["Afișează un mesaj TOAST (notificare temporară) care dispare automat","Afișează un mesaj permanent","Adaugă un comentariu în cod","Trimite notificare push"],correct:0,ex:"st.toast() afișează o notificare temporară (toast) în colțul ecranului. Dispare automat după câteva secunde."},
+{cat:"streamlit",text:"Cum se reactualizează un placeholder creat cu st.empty()?",opts:["Nu se poate actualiza","placeholder = st.empty(); placeholder.write('text nou')","st.empty().update('text nou')","st.refresh(placeholder)"],correct:1,ex:"st.empty() creează un placeholder. Salvați-l într-o variabilă și apelați .write(), .dataframe() etc. pe el pentru a actualiza conținutul."},
+{cat:"streamlit",text:"Ce face st.tabs(['Tab1', 'Tab2', 'Tab3'])?",opts:["Creează tab-uri — returnează o listă de obiecte Tab","Creează un meniu drop-down","Afișează etichete","Creează butoane"],correct:0,ex:"tabs = st.tabs(['A','B','C']) returnează o listă de obiecte Tab. with tabs[0]: st.write('conținut tab 1')."},
+{cat:"streamlit",text:"Care metodă nu este de INPUT în Streamlit?",opts:["st.text_input","st.number_input","st.table","st.file_uploader"],correct:2,ex:"st.table() = AFIȘARE (statică), nu input. Text_input, number_input, file_uploader, slider, selectbox sunt widget-uri de INPUT."},
+{cat:"streamlit",text:"Cum se afișează un mesaj EXCEPTION în Streamlit?",opts:["st.error(exception_msg)","st.exception(e) — afișează stack trace-ul complet al excepției","st.show_error(e)","st.throw(e)"],correct:1,ex:"st.exception(e) afișează tipul excepției și stack trace-ul complet (similar cu consola Python). st.error() afișează doar un text roșu."},
+{cat:"streamlit",text:"Cum se creează o aplicație Streamlit cu navigare în sidebar folosind selectbox?",opts:["st.sidebar.menu(['Pag1','Pag2'])","section = st.sidebar.selectbox('Meniu', ['Pag1','Pag2'])  + if section==...: ...","st.navbar(['Pag1','Pag2'])","st.pages(['Pag1','Pag2'])"],correct:1,ex:"Selectbox în sidebar + condiții if/elif pentru fiecare pagină — metodă simplă de navigare. Sau st.sidebar.radio()."},
+{cat:"streamlit",text:"Ce face st.sidebar ca element de layout?",opts:["Adaugă elemente la stânga în bara laterală","Creează un pop-up","Adaugă elemente în partea de jos","Creează un meniu contextual"],correct:0,ex:"st.sidebar este un container special pentru bara laterală (sidebar). Orice st.* apelat prin st.sidebar.* apare în sidebar."},
+{cat:"streamlit",text:"Care afirmație despre st.markdown('HTML', unsafe_allow_html=True) este CORECTĂ?",opts:["Permite inserarea de HTML (tag-uri, styling) în markdown — risc de securitate dacă e conținut neverificat","Este interzis — nu se poate folosi HTML","Afișează HTML ca text simplu","Necesită import suplimentar"],correct:0,ex:"unsafe_allow_html=True permite renderizarea HTML în markdown. Util pentru styling avansat. Periculos cu conținut neverificat (JS injection)."},
+{cat:"streamlit",text:"Ce face st.chat_message('user') în Streamlit?",opts:["Trimite un mesaj în chat","Creează un element de mesaj CHAT (cu avatar) — util pentru aplicații de tip chatbot","Afișează un log","Deschide chat-ul"],correct:1,ex:"st.chat_message() creează un container de mesaj stilizat pentru chat. Folosit cu st.chat_input() pentru aplicații de tip conversațional."},
+{cat:"streamlit",text:"Cum se stochează un istoric de chat în Streamlit?",opts:["Într-o listă globală simplă","În session_state ca listă de mesaje: if 'messages' not in st.session_state: st.session_state.messages = []","În fișier local","În variabilă de mediu"],correct:1,ex:"Chat history se stochează în session_state (persistent între rerun-uri). Lista globală s-ar reseta la fiecare interacțiune."},
+{cat:"streamlit",text:"Ce face st.feedback() în Streamlit?",opts:["Creează un formular de feedback","Afișează o întrebare: thumbs up/down — returnează '👍' sau '👎'","Trimite feedback la dezvoltator","Afișează erori"],correct:1,ex:"st.feedback() afișează butoane de thumbs up/down și returnează string-ul cu alegerea. Util pentru evaluare rapidă."},
+{cat:"streamlit",text:"Care este portul implicit pe care rulează Streamlit local?",opts:["3000","5000","8080","8501"],correct:3,ex:"Streamlit rulează implicit pe http://localhost:8501. Poate fi schimbat cu --server.port."},
+{cat:"streamlit",text:"Cum se afișează un grafic Altair în Streamlit?",opts:["st.altair(chart)","st.altair_chart(chart)","st.show(chart)","st.plotly_chart(chart)"],correct:1,ex:"st.altair_chart(chart) afișează grafice create cu altair (bibliotecă declarativă de vizualizare). La fel: st.plotly_chart() pentru plotly."},
+{cat:"streamlit",text:"Ce face st.balloons() când este apelat?",opts:["Afișează o animație cu BALOANE de sărbătoare (efect vizual)","Afișează un grafic cu baloane","Creează butoane rotunde","O aplicație de baloane"],correct:0,ex:"st.balloons() este un efect vizual distractiv — animație cu baloane care zboară. St.snow() face fulgi de zăpadă. Folosit la evenimente speciale."},
+{cat:"streamlit",text:"Cum se afișează cod SAS în Streamlit cu syntax highlighting?",opts:["st.code('proc print; run;', language='sas')","st.sas('proc print; run;')","st.highlight('proc print; run;', lang='sas')","st.show_code('proc print; run;')"],correct:0,ex:"st.code() acceptă parametrul language= care poate fi 'python', 'sql', 'sas', 'r' etc. Afișează cod cu syntax highlighting."},
+{cat:"streamlit",text:"Cum rulezi un script Streamlit în modul de dezvoltare cu reîncărcare automată?",opts:["Se reîncarcă automat — nu e nevoie de opțiune","streamlit run app.py (implicit reîncarcă la modificare)","streamlit dev app.py","streamlit run app.py --dev"],correct:1,ex:"Streamlit reîncarcă automat aplicația când detectează modificări în fișierul .py (hot reloading). Nu e nevoie de opțiuni speciale."},
+{cat:"streamlit",text:"Cum se adaugă o parolă mascată în Streamlit?",opts:["st.password_input('Parola')","st.text_input('Parola', type='password')","st.secret_input('Parola')","st.hidden_input('Parola')"],correct:1,ex:"type='password' la st.text_input() maschează caracterele introduse. Util pentru formulare de login."},
+{cat:"streamlit",text:"Ce face st.status('Running...')?",opts:["Afișează un indicator de stare (running, complete, error) cu iconițe","Verifică starea serverului","Afișează codul HTML al paginii","Monitorizează sesiunea"],correct:0,ex:"st.status() creează un container de stare cu update() și .complete()/.error() pentru a notifica progresul."},
+{cat:"streamlit",text:"Cum se dezactivează st.file_uploader pentru fișiere mari?",opts:["Nu se poate","st.file_uploader('F', max_upload_size=...) — parametru implicit","Cu st.cache_data pe funcția de procesare","Cu st.config.maxUploadSize"],correct:2,ex:"Limita de upload se setează în config (streamlit config ui.maxUploadSize) sau în command line. File_uploader nu are parametru de max size direct."},
+{cat:"streamlit",text:"Ce face st.snow() în Streamlit?",opts:["Afișează date meteo","Afișează o animație cu FULGI DE ZĂPADĂ (efect vizual)","Generează date de iarnă","Creează un grafic de tip snowfall"],correct:1,ex:"st.snow() = efect vizual cu fulgi de zăpadă (similar cu st.balloons()). Folosit pentru evenimente speciale sau sărbători."},
+
+// ===== SAS (24 grile) =====
+{cat:"sas",text:"Ce fac variabilele FIRST. și LAST. în DATA step cu BY?",opts:["Sortează datele","Sunt variabile AUTOMATE care indică PRIMA/ULTIMA observație dintr-un grup BY","Filtrează grupurile","Șterg duplicatele"],correct:1,ex:"La utilizarea BY în DATA step, SAS creează AUTOMAT variabilele FIRST.var (1=prima obs a grupului) și LAST.var (1=ultima obs a grupului)."},
+{cat:"sas",text:"Ce face 'merci' de fapt în data step? (greșeală frecventă)",opts:["Merge corect","EROARE de sintaxă — SAS nu recunoaște cuvântul","Face MERGE","Generează o avertizare și continuă"],correct:1,ex:"Orice cuvânt nerecunoscut în SAS generează eroare. SAS citește 'merci' ca o instrucțiune invalidă → ERROR."},
+{cat:"sas",text:"Ce face 'data a; x=0; do while(x<5); x+1; end; run;'?",opts:["Eroare — DO WHILE nu există","Buclă care rulează de 5 ori (x=1,2,3,4,5), apoi x=5","Buclă infinită","Buclă care rulează de 4 ori"],correct:1,ex:"x pornește de la 0. DO WHILE verifică la început. x+1 (acumulator) adună 1. Când x=5, condiția x<5 e falsă și bucla se oprește."},
+{cat:"sas",text:"Cum se calculează media unei variabile în SAS fără a afișa rezultatul?",opts:["Nu se poate","Se folosește PROC MEANS noprint cu output out=...","Se face doar cu DATA step","Cu PROC PRINT"],correct:1,ex:"proc means noprint data=a; var x; output out=rezultat mean(x)=medie; run; — noprint suprimă afișarea."},
+{cat:"sas",text:"Ce face data final; merge a(in=ia) b(in=ib); by ID; if ia and not ib; run; ?",opts:["Toate din a și b","Doar observațiile comune","Doar observațiile care sunt DOAR în a (NU și în b)","Doar observațiile din b"],correct:2,ex:"ia=1 dacă ID există în a, ib=1 dacă există în b. 'if ia and not ib' = doar cele din a care NU au corespondent în b."},
+{cat:"sas",text:"Cum se citește un fișier cu delimitator TAB în SAS?",opts:["infile 'f.txt' dlm='09'x;","infile 'f.txt' delimiter=',';","infile 'f.txt' dlm='tab';","infile 'f.txt' dlm='\\t';"],correct:0,ex:"TAB în SAS se reprezintă ca '09'x (hexazecimal). DLM='09'x sau DELIMITER='09'x. Pentru virgulă: DSD."},
+{cat:"sas",text:"Ce face ARRAY t{*} _temporary_ în SAS?",opts:["Creează variabile permanente","Creează un array TEMPORAR care NU scrie variabile în setul de ieșire — doar pentru calcule în memorie","Creează variabile globale","Creează un array permanent"],correct:1,ex:"_temporary_ creează elemente de array care NU apar în setul de date de ieșire. Folosite pentru tabele de căutare, acumulatori, constante."},
+{cat:"sas",text:"Ce face '%LET nume = Ion;' în SAS macro?",opts:["Definește o variabilă de date","Definește o MACRO VARIABILĂ cu valoarea 'Ion' — fără ghilimele","Creează o coloană","Setează o etichetă"],correct:1,ex:"%LET nume = valoare; definește o macro variabilă. Referire: &nume. Nu se pun ghilimele în jurul valorii."},
+{cat:"sas",text:"Cum se definește un macro cu parametri în SAS?",opts:["%MACRO calc(x, y); ... %MEND;","%M ACRO calc(x=, y=); ... %MEND;","%DEFINE calc(x, y); ... %END;","%FUNCTION calc(x, y); ... %END;"],correct:0,ex:"%MACRO nume(param1, param2, ...); ... %MEND;. Apelare: %nume(val1, val2). Parametrii pot fi poziționali sau cu nume (param=)."},
+{cat:"sas",text:"Ce face PROC COMPARE în SAS?",opts:["Compară două seturi de date și raportează diferențele (variabile, valori)","Compară două variabile","Face sortare comparativă","Elimină duplicatele"],correct:0,ex:"PROC COMPARE compară două seturi de date (base= vs compare=) și raportează diferențele în variabile, valori, atribute."},
+{cat:"sas",text:"Ce face %PUT în SAS?",opts:["Afișează text în LOG (util pentru depanare macro)","Creează o variabilă","Salvează în fișier","Afișează pe ecran"],correct:0,ex:"%PUT (macro PUT) afișează mesaje în SAS log. Similar cu PUT dar pentru macro. %PUT &=nume; = util pentru debugging macro variabile."},
+{cat:"sas",text:"Ce este SYMPUT vs SYMGET în SAS macro?",opts:["Sunt sinonime","SYMPUT creează o macro variabilă dintr-un DATA step; SYMGET citește valoarea unei macro variabile","SYMPUT citește; SYMGET scrie","Ambele creează variabile"],correct:1,ex:"CALL SYMPUT('var', valoare) = scrie din DATA step în macro. %SYMGET(nume) = citește valoarea macro variabilei. SYMGET se poate folosi și în DATA step."},
+{cat:"sas",text:"Cum se definește un format cu intervale multiple și OTHERWISE?",opts:["proc format; value f low-50='Mic' 51-100='Mediu' 101-high='Mare' other='N/A'; run;","proc format; value f low-50='Mic' 51-100='Mediu' 101-high='Mare'; run; (other nu există)","Proc format; format f low-50='Mic' ...; run;","proc format; value f (low-50)='Mic' (51-100)='Mediu'; run;"],correct:0,ex:"OTHER keyword (nu OTHERWISE — care e pentru SELECT) se pune la sfârșit. 'other=' captează orice valoare neacoperită."},
+{cat:"sas",text:"Ce face 'data b; set a; where var1 = .; run;'?",opts:["Creează b cu variabilele unde var1 e 0","Creează b cu observațiile unde var1 e lipsă (.)","Șterge observațiile cu var1 lipsă","Eroare"],correct:1,ex:"WHERE var1 = . selectează observațiile unde var1 = valoare lipsă numerică. Alternativ: WHERE missing(var1) sau WHERE var1 is missing."},
+{cat:"sas",text:"Ce face instrucțiunea CARDS (sau CARDS4) în SAS?",opts:["Alt nume pentru DATALINES (date în cod) — CARDS e alias mai vechi","Citește din fișier card","Creează un grafic","O procedură"],correct:0,ex:"CARDS = DATALINES (sinonim). Ambele permit introducerea datelor în codul programului SAS. CARDS4 = pentru date cu ; (punct și virgulă) în interior."},
+{cat:"sas",text:"Ce face 'proc format; value $gen 'M','F'='DA' other='NU'; run;'?",opts:["Eroare — lista de valori se separă cu virgulă","Definește un format caracter $gen care returnează 'DA' pentru M sau F, 'NU' pentru rest","Definește un format numeric","Aplică automat formatul"],correct:1,ex:"$ indică format CARACTER. Valorile multiple se separă prin virgulă. 'M','F'='DA' = ambele valori M și F devin 'DA'."},
+{cat:"sas",text:"Ce face 'data a; set b; by ID; if first.ID then cumul=0; cumul+valoare; if last.ID then output; run;'?",opts:["Calculează valoarea cumulată per grup ID — scrie DOAR ultima observație a fiecărui grup","Calculează media per grup","Sortează datele","Elimină duplicatele"],correct:0,ex:"La first.ID, cumul=0 (resetare per grup). cumul+valoare = sumă cumulată. La last.ID se face OUTPUT (doar ultima obs a grupului) → total per grup."},
+{cat:"sas",text:"Care este diferența dintre DROP și KEEP în DATA step?",opts:["DROP șterge variabilele din calcul; KEEP le păstrează","DROP eliberează variabilele din setul de ieșire; KEEP le reține — ambele sunt valabile pentru calcul","DROP nu lasă variabilele nici în calcul; KEEP da","Sunt sinonime"],correct:1,ex:"Atât DROP cât și KEEP lasă variabilele disponibile pentru CALCUL în DATA step. Ele controlează ce VARIABILE apar în setul de IEȘIRE."},
+{cat:"sas",text:"Ce face 'merge a(in=ia) b(in=ib); by ID; if ia;' ?",opts:["LEFT JOIN — toate din a + corespondentele din b (doar observațiile din a)","INNER JOIN","RIGHT JOIN","FULL OUTER"],correct:0,ex:"if ia; păstrează doar observațiile care au corespondent în a. Echivalent cu LEFT JOIN: toate din a, valorile din b unde există corespondent."},
+{cat:"sas",text:"Cum se creează un VIEW SAS (tabelă virtuală)?",opts:["Nu se poate","data a / view=a; set b; run;","proc create view;","data a_view; view a; set b; run;"],correct:1,ex:"data a / view=a; (slash view=) creează un VIEW — nu date fizice, ci o definiție salvată. La accesare, se execută codul din view."},
+{cat:"sas",text:"Ce face funcția LAG(n)(x) în SAS?",opts:["Întârzie variabila cu n observații (returnează valoarea de acum n observații)","Calculează lag-ul unei serii","Adună n la x","Creează o variabilă nouă"],correct:0,ex:"LAG1(x) = valoarea lui x de la observația anterioară. LAG2(x) = de acum 2 observații. LAG(n)(x) = forma modernă. ATENȚIE: LAG creează o coadă FIFO."},
+{cat:"sas",text:"Ce face 'proc sgplot data=a; scatter x=an y=venit; run;'?",opts:["Creează un grafic de tip scatter (puncte) cu SAS/GRAPH","Creează un grafic scatter cu SGPLOT (Statistical Graphics) — mai nou decât GPLOT","Creează un tabel","Calculează corelația"],correct:1,ex:"PROC SGPLOT este parte din ODS Statistical Graphics — mai modern decât GPLOT (SAS/GRAPH). scatter = grafic de dispersie."},
+{cat:"sas",text:"Ce face 'proc transpose data=a out=b; by ID; var venit; run;'?",opts:["NU există PROC TRANSPOSE","TRANSPUNE (rotește) datele — rânduri devin coloane și invers","Sortează datele","Filtrează datele"],correct:1,ex:"PROC TRANSPOSE transformă structura setului de date: rânduri → coloane (sau invers). BY ID grupează observațiile per ID."},
+{cat:"sas",text:"Ce face PROC DATASETS în SAS?",opts:["Creează seturi de date","Gestionează seturile de date (copiere, redenumire, ștergere, listare) fără a le citi","Sortează seturi","Importă date"],correct:1,ex:"PROC DATASETS = utilitar pentru manipularea metadatelor: copiere, redenumire, ștergere seturi, modificare atribute variabile. Nu citește datele efective."},
+
+// ===== TEORIE (24 grile) =====
+{cat:"teorie",text:"Ce reprezintă analiza PREDICTIVĂ a datelor?",opts:["Ce s-a întâmplat în trecut — raportare și vizualizare","Ce se poate întâmpla în viitor — prognoze și modelare","Ce trebuie să facem — optimizare","Colectarea datelor"],correct:1,ex:"Analiza predictivă răspunde la 'Ce se poate întâmpla?' Folosește modele statistice, ML, data mining pentru a face previziuni și a identifica pattern-uri."},
+{cat:"teorie",text:"Ce este SAS Enterprise Guide?",opts:["Un limbaj de programare","O interfață GRAFICĂ (point-and-click) care generează cod SAS în fundal — pentru utilizatori non-programatori","O bază de date","Un sistem de operare"],correct:1,ex:"SAS Enterprise Guide (EG) = interfață grafică care permite analiza datelor prin drag-and-drop, generând cod SAS automat."},
+{cat:"teorie",text:"Ce reprezintă ciclul de prelucrare a datelor (în contextul cursului)?",opts:["Colectare → Analiză → Raportare → Arhivare","Date → Analiză → Înțelegere → Decizie","Input → Procesare → Output","Planificare → Execuție → Evaluare"],correct:1,ex:"Ciclul din curs: Date → Analiză (procesare/explorare) → Înțelegere (insight-uri) → Decizie (acțiuni). Ciclul se reia continuu."},
+{cat:"teorie",text:"Ce bibliotecă SAS oferă proceduri pentru SERY DE TIMP (econometrie)?",opts:["SAS/STAT","SAS/ETS","SAS/OR","SAS/IML"],correct:1,ex:"SAS/ETS (Econometrics and Time Series) oferă proceduri pentru analiza seriilor de timp, prognoză, modelare econometrică."},
+{cat:"teorie",text:"Care metodă de codificare este potrivită pentru variabile ORDINALE (ex: mic/mediu/mare)?",opts:["One-Hot Encoding","Label Encoding","Target Encoding","Base Encoding"],correct:1,ex:"Label Encoding (0,1,2,...) păstrează ordinea naturală și este potrivit pentru variabile ordinale. One-Hot e pentru nominale (fără ordine)."},
+{cat:"teorie",text:"Ce înseamnă date TRanzacționale în contextul cursului?",opts:["Date colectate din tranzacții financiare (achiziții, comenzi) — asociate unui eveniment tranzacțional","Date despre tranzacții în procesare paralelă","Date în tranzit","Date de tip text"],correct:0,ex:"Date tranzacționale: asociate unui EVENIMENT (achiziție, comandă, plată). Conțin: articol, locație, timp, preț, reduceri, mod de plată."},
+{cat:"teorie",text:"Ce este un SGBD (Sistem de Gestiune a Bazelor de Date)?",opts:["Un fișier Excel","Un set de programe pentru definirea, manipularea și gestionarea bazelor de date relaționale","Un limbaj de programare","Un sistem de operare"],correct:1,ex:"SGBD = software pentru gestionarea bazelor de date (ex: Oracle, MySQL, SQL Server, PostgreSQL). Include funcții de securitate, integritate, concurență."},
+{cat:"teorie",text:"Ce etichetă se aplică cloud-ului PRIVAT?",opts:["Infrastructura este partajată public","Infrastructura este dedicată UNEI SINGURE organizații","Infrastructura este gratuită","Infrastructura nu există"],correct:1,ex:"Cloud privat = infrastructura dedicată unei singure organizații. Poate fi on-premise sau găzduită de un provider. Mai scump dar mai controlabil decât public."},
+{cat:"teorie",text:"Ce este cvasi-experimentul în contextul analizei datelor?",opts:["Un experiment cu control randomizat","Un studiu unde NU există randomizare completă — grupurile sunt observaționale","Un experiment fals","O simulare"],correct:1,ex:"Cvasi-experiment = studiu observațional cu intervenție, dar fără randomizare completă. Util când experimentul controlat nu e fezabil."},
+{cat:"teorie",text:"Care este avantajul principal al SAS Viya față de SAS 9.4?",opts:["Nu necesită licență","Arhitectură în cloud, în memorie (in-memory), scalabilă, suport pentru ML și AI","Nu are SAS language","E gratuit"],correct:1,ex:"SAS Viya = platformă cloud-native, in-memory, scalabilă orizontal. Suportă Python, R, Lua pe lângă SAS. SAS 9.4 = versiunea tradițională."},
+{cat:"teorie",text:"Ce caracterizează software-ul OPEN-SOURCE?",opts:["E întotdeauna gratuit","Codul sursă este DISPONIBIL și poate fi studiat/modificat/redistribuit (conform licenței)","Nu poate fi folosit comercial","Nu are documentație"],correct:1,ex:"Open-source = cod sursă accesibil, cu licență care permite studiu, modificare, redistribuire. NU înseamnă neapărat gratuit (ex: variante enterprise)."},
+{cat:"teorie",text:"Ce reprezintă ODS (Output Delivery System) în SAS?",opts:["Un sistem de operare","Un sistem care permite DIRECȚIONAREA IEȘIRII în multiple formate (PDF, HTML, Excel, RTF)","O bază de date","Un sistem de fișiere"],correct:1,ex:"ODS controlează formatul și destinația output-ului SAS. ods pdf; proc print; run; ods pdf close; → output în PDF."},
+{cat:"teorie",text:"Care este rolul variabilei _N_ în DATA step SAS?",opts:["Numără observațiile (inițial 0, se incrementează automat)","Numele setului de date","Numărul de variabile","Numărul de caractere"],correct:0,ex:"_N_ = variabilă AUTOMATĂ care numără iterațiile DATA step (începe de la 1 implicit). Utilă pentru numărarea observațiilor procesate."},
+{cat:"teorie",text:"Ce este SAS Studio?",opts:["O aplicație desktop","Un mediu de dezvoltare BAZAT PE NAVIGATOR (web) pentru SAS — nu necesită instalare locală","Un editor de texte","O bază de date"],correct:1,ex:"SAS Studio = IDE web-based pentru SAS. Rulează în browser. Conectat la un server SAS (SAS OnDemand, local, sau Viya)."},
+{cat:"teorie",text:"Care dintre următoarele NU este o etapă în preprocesarea datelor?",opts:["Tratarea valorilor lipsă","Codificarea valorilor non-numerice","Validarea modelului","Scalarea"],correct:2,ex:"Validarea modelului (evaluare, metrici) vine DUPĂ antrenare. Preprocesarea include: valori lipsă → codificare → outlieri → scalare."},
+{cat:"teorie",text:"Ce reprezintă OLAP (Online Analytical Processing)?",opts:["Procesare tranzacțională online","Procesare ANALITICĂ online — interogări multidimensionale (ex: cuburi, dimensiuni, măsuri)","Procesare batch","Procesare text"],correct:1,ex:"OLAP = sistem pentru analiză multidimensională rapidă. Date organizate în cuburi cu dimensiuni (timp, regiune, produs) și măsuri (vânzări, cantitate)."},
+{cat:"teorie",text:"Ce face PROC IMPORT în SAS?",opts:["Exportă date","IMPORTĂ date din fișiere externe (CSV, Excel, Access, SPSS) — detectează automat tipurile","Creează tabele","Filtrează date"],correct:1,ex:"PROC IMPORT este o procedură ușoară pentru importul datelor din fișiere externe (DBMS=). Detectează automat tipurile de date. Alternativa manuală: INFILE+INPUT."},
+{cat:"teorie",text:"Ce este o LICENȚĂ VOLUM în context software?",opts:["Licență individuală","Licență care permite utilizarea software-ului pe mai multe calculatoare/instanțe în cadrul aceleiași organizații","Licență gratuită","Licență pe termen nelimitat"],correct:1,ex:"Licență volum (volume license) = acord care permite instalarea pe mai multe dispozitive într-o organizație, de obicei cu preț redus per unitate."},
+{cat:"teorie",text:"Ce face StandardScaler în sklearn (scalare)?",opts:["Scalează la intervalul [0,1]","Standardizează: (x - medie) / abatere_standard → medie 0, std 1","Scalează după quartile","Elimină outlieri"],correct:1,ex:"StandardScaler: x' = (x - μ) / σ. RobustScaler: (x - median) / IQR (mai robust la outlieri). MinMaxScaler: (x - min) / (max - min)."},
+{cat:"teorie",text:"Ce înseamnă acronimul CRISP-DM?",opts:["Cross-Industry Standard Process for Data Mining","Crisp Data Management","Complete Research in Statistical Programming","Cross-Reference in Data Models"],correct:0,ex:"CRISP-DM = metodologie standard pentru proiecte de data mining: Înțelegerea businessului → Înțelegerea datelor → Pregătirea datelor → Modelare → Evaluare → Implementare."},
+{cat:"teorie",text:"Ce este un GANTT chart și ce procedură SAS îl produce?",opts:["Grafic cu bare pentru planificare proiecte — PROC GANTT (SAS/OR)","Grafic de corelație — PROC CORR","Grafic de distribuție — PROC UNIVARIATE","Histogramă — PROC FREQ"],correct:0,ex:"GANTT chart = grafic pentru planificarea și urmărirea proiectelor (activități pe axa timpului). PROC GANTT face parte din SAS/OR."},
+{cat:"teorie",text:"Ce înseamnă 'date structurate' vs 'date nestructurate'?",opts:["Structurate = organizate în rânduri și coloane (tabele); Nestructurate = text, imagini, video, fără schemă fixă","Structurate = în cloud; Nestructurate = local","Structurate = mari; Nestructurate = mici","Structurate = numerice; Nestructurate = text"],correct:0,ex:"Date structurate: tabele relaționale, CSV, Excel (scheme fixă). Date nestructurate: documente text, imagini, video, audio, social media — fără structură predefinită."},
+{cat:"teorie",text:"Ce face PROC SQL cu CREATE TABLE în SAS?",opts:["Creează un tabel în baza de date SQL Server","Creează un set de date SAS dintr-o interogare SQL","Creează o vedere (view)","Creează un index"],correct:1,ex:"CREATE TABLE nume AS SELECT ...; creează un set de date SAS (temporar sau permanent) din rezultatul interogării SQL."},
+{cat:"teorie",text:"Care este diferența dintre SET și MERGE în contextul combinării seturilor SAS?",opts:["SET = fuziune pe coloane; MERGE = concatenare","SET = adăugare (rânduri unul după altul); MERGE = îmbinare pe coloane (pe baza unei chei comune)","Sunt sinonime","SET lucrează cu fișiere externe; MERGE cu seturi SAS"],correct:1,ex:"SET adaugă observații VERTICAL (concatenare). MERGE combină PE ORIZONTALĂ (pe baza BY) — adaugă coloane din seturi diferite."},
+];
+</script>
+<script>
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, dispIdx) => {
+    const globalIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card' + (answered[globalIdx] !== undefined ? ' answered' : '');
+    div.id = 'q-' + globalIdx;
+    const letters = ['a','b','c','d'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[globalIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[globalIdx] && answered[globalIdx] !== q.correct) cls += ' wrong';
+      }
+      const letter = letters[i] || String.fromCharCode(97 + i);
+      return `<div class="${cls}" onclick="selectAnswer(${globalIdx},${i})">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`;
+    }).join('');
+    let fbHtml = '';
+    if (answered[globalIdx] !== undefined) {
+      const isC = answered[globalIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isC?'correct-fb':'wrong-fb'} show">${isC?'✓ Corect! ':'✗ Greșit! '}${q.ex}</div>`;
+    }
+    div.innerHTML = `<div class="q-meta"><span class="q-num">#${dispIdx+1}</span><span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span></div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>${fbHtml}`;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(gi, oi) {
+  if (answered[gi] !== undefined) return;
+  answered[gi] = oi;
+  if (oi === questions[gi].correct) correctCount++; else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '✓ ' + correctCount;
+  document.getElementById('wrong-count').textContent = '✗ ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% răspunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleAll() {
+  for (let i = questions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [q.opts[i],q.opts[j]] = [q.opts[j],q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q,i) => { if (answered[i]===undefined) answered[i]=q.correct; });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAS Programare — Recapitulare PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--orange:#f97316;--blue:#3b82f6;--code-bg:#0d1117;--warn-bg:#2d2200;--warn-border:#f59e0b;--tip-bg:#002d1a;--tip-border:#10b981;--danger-bg:#2d0505;--danger-border:#ef4444;--info-bg:#001a2d;--info-border:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+#nav{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100;}
+#nav h2{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 20px 12px;}
+#nav a{display:block;padding:7px 20px;color:var(--text-muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .2s;}
+#nav a:hover,#nav a.active{color:var(--accent-light);border-left-color:var(--accent);background:rgba(99,102,241,.08);}
+#nav .section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;padding:16px 20px 4px;}
+#main{margin-left:260px;padding:40px 48px;max-width:960px;}
+.page-title{font-size:32px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#34d399,var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-sub{color:var(--text-muted);font-size:15px;margin-bottom:40px;}
+.section{margin-bottom:48px;scroll-margin-top:80px;}
+h2.sec-title{font-size:20px;font-weight:600;color:var(--accent-light);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px;}
+h3.sub-title{font-size:15px;font-weight:600;color:var(--text);margin:20px 0 10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;margin:12px 0;}
+code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre code{background:none;padding:0;color:var(--text);}
+.kw{color:#c084fc;}.fn{color:#38bdf8;}.str{color:#86efac;}.num{color:#fb923c;}.cm{color:#475569;}.var{color:#e2e8f0;}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.warn::before{content:"⚠️ ATENȚIE: ";font-weight:700;color:var(--yellow);}
+.tip{background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.tip::before{content:"✓ REȚINE: ";font-weight:700;color:var(--green);}
+.danger{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.danger::before{content:"✗ EROARE FRECVENTĂ: ";font-weight:700;color:var(--red);}
+.info{background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.info::before{content:"ℹ INFO: ";font-weight:700;color:var(--blue);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th{background:var(--surface2);color:var(--accent-light);padding:10px 14px;text-align:left;font-weight:600;border:1px solid var(--border);}
+td{padding:9px 14px;border:1px solid var(--border);}
+tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.mini-card{background:var(--surface2);border-radius:8px;padding:14px;}
+.mini-card h4{font-size:12px;font-weight:700;color:var(--accent-light);margin-bottom:8px;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:900px){#nav{display:none;}#main{margin-left:0;padding:24px 20px;}}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <h2>PSW — SAS</h2>
+  <div class="section-label">Baze</div>
+  <a href="#sintaxa">Sintaxă de bază</a>
+  <a href="#tipuri">Tipuri & Variabile</a>
+  <a href="#libname">LIBNAME & INFILE ⚠️</a>
+  <div class="section-label">DATA Step</div>
+  <a href="#data">DATA Step</a>
+  <a href="#set">SET, MERGE, APPEND</a>
+  <a href="#in">IN= (corespondențe)</a>
+  <div class="section-label">Logica</div>
+  <a href="#if">IF / SELECT</a>
+  <a href="#where">WHERE vs IF ⚠️</a>
+  <a href="#do">DO / WHILE / UNTIL</a>
+  <div class="section-label">Formate</div>
+  <a href="#formate">Formate & PROC FORMAT ⚠️</a>
+  <a href="#put_input">PUT vs INPUT ⚠️</a>
+  <div class="section-label">Proceduri</div>
+  <a href="#proc_sort">PROC SORT</a>
+  <a href="#proc_means">PROC MEANS</a>
+  <a href="#proc_freq">PROC FREQ</a>
+  <a href="#proc_print">PROC PRINT</a>
+  <a href="#proc_sql">PROC SQL</a>
+  <div class="section-label">Avansat</div>
+  <a href="#arrays">ARRAY ⚠️</a>
+  <a href="#macro">Macro</a>
+  <a href="#functii">Funcții SAS</a>
+  <div class="section-label">Capcane</div>
+  <a href="#traps">Capcane frecvente</a>
+</nav>
+
+<main id="main">
+  <h1 class="page-title">SAS Programare — Recapitulare</h1>
+  <p class="page-sub">DATA step, PROC step, formate, combinare seturi de date</p>
+
+  <!-- ====== SINTAXA ====== -->
+  <section class="section" id="sintaxa">
+    <h2 class="sec-title">Sintaxă de bază</h2>
+    <div class="card" style="border-color:var(--yellow);">
+      <strong>REGULA #1:</strong> Fiecare declarație se termină cu <strong>PUNCT ȘI VIRGULĂ (;)</strong>
+    </div>
+    <pre><code><span class="cm">/* Structura unui program SAS */</span>
+<span class="kw">libname</span> <span class="var">mylib</span> <span class="str">'/home/user/date'</span>;   <span class="cm">/* declară o bibliotecă */</span>
+
+<span class="cm">/* DATA step */</span>
+<span class="kw">data</span> <span class="var">mylib.studenti</span>;
+    <span class="kw">set</span> <span class="var">mylib.studenti_raw</span>;
+    <span class="cm">/* instrucțiuni */</span>
+<span class="kw">run</span>;
+
+<span class="cm">/* PROC step */</span>
+<span class="kw">proc print</span> <span class="var">data</span>=<span class="var">mylib.studenti</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Comentarii: /* */ sau * text ; */</span>
+* Acesta este un comentariu;
+<span class="cm">/* Acesta de asemenea */</span></code></pre>
+    <div class="info">
+      Programul SAS are 2 tipuri de secțiuni: <strong>DATA step</strong> (pregătire date) și <strong>PROC step</strong> (rapoarte, analize). LIBNAME nu este o secțiune.
+    </div>
+  </section>
+
+  <!-- ====== TIPURI ====== -->
+  <section class="section" id="tipuri">
+    <h2 class="sec-title">Tipuri de date & Variabile</h2>
+    <div class="grid2">
+      <div class="mini-card">
+        <h4>NUMERIC</h4>
+        <ul style="font-size:13px;margin-left:16px;line-height:1.9;">
+          <li>Implicite dacă nu există $</li>
+          <li>Valoare lipsă = <code>.</code> (punct)</li>
+          <li>Lungime implicită = 8 bytes</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h4>CARACTER</h4>
+        <ul style="font-size:13px;margin-left:16px;line-height:1.9;">
+          <li>Marcate cu <code>$</code> în INPUT</li>
+          <li>Valoare lipsă = spații</li>
+          <li>Orice conținut mixt → CARACTER</li>
+        </ul>
+      </div>
+    </div>
+    <div class="danger">
+      O coloană cu valori mixte (numere + text, ex: "3456_1", "Romano", "Choi") → tip <strong>CHARACTER</strong>
+    </div>
+    <pre><code><span class="cm">/* Citire cu INPUT */</span>
+<span class="kw">input</span> <span class="var">Nume</span> $ <span class="var">Pret</span> <span class="var">Categorie</span> $;
+<span class="cm">/* $ = variabilă caracter; fără $ = numeric */</span>
+
+<span class="cm">/* Lungime variabilă nouă (EVITAREA TRUNCHIERII) */</span>
+<span class="kw">length</span> <span class="var">Raportare</span> $ <span class="num">8</span>;   <span class="cm">/* ÎNAINTE de utilizare! */</span>
+<span class="kw">if</span> <span class="var">Tip</span> = <span class="str">'A'</span> <span class="kw">then</span> <span class="var">Raportare</span> = <span class="str">'Acceptat'</span>;
+<span class="kw">else</span> <span class="var">Raportare</span> = <span class="str">'Respins'</span>;</code></pre>
+    <div class="warn">
+      <strong>Trunchierea:</strong> SAS fixează lățimea variabilei noi după PRIMA observație. Dacă prima valoare e "Mic" (3 car.) și următoarea e "Mediu" (5 car.), "Mediu" va fi trunchiat! → Folosiți <code>LENGTH</code> ÎNAINTE.
+    </div>
+  </section>
+
+  <!-- ====== LIBNAME ====== -->
+  <section class="section" id="libname">
+    <h2 class="sec-title">⚠️ LIBNAME vs INFILE</h2>
+    <div class="grid2">
+      <div class="mini-card">
+        <h4>LIBNAME → DIRECTOR</h4>
+        <pre style="margin:8px 0 0"><code><span class="kw">libname</span> <span class="var">prod</span> <span class="str">'/home/user'</span>;
+<span class="cm">/* pointer la FOLDER */</span>
+<span class="cm">/* permite prod.numeset */</span></code></pre>
+      </div>
+      <div class="mini-card">
+        <h4>INFILE → FIȘIER</h4>
+        <pre style="margin:8px 0 0"><code><span class="kw">infile</span> <span class="str">'/home/user/date.txt'</span>;
+<span class="cm">/* pointer la FIȘIER */</span>
+<span class="cm">/* pentru citire date raw */</span></code></pre>
+      </div>
+    </div>
+    <div class="danger">
+      <code>libname date '/home/user/fisier.txt';</code> → <strong>EROARE</strong> (libname pe fișier, nu director)<br>
+      <code>infile '/home/user/';</code> → <strong>EROARE</strong> (infile pe director, nu fișier)
+    </div>
+    <pre><code><span class="cm">/* Corect */</span>
+<span class="kw">libname</span> <span class="var">date</span> <span class="str">'/home/user'</span>;          <span class="cm">/* director ✓ */</span>
+<span class="kw">infile</span> <span class="str">'/home/user/date.txt'</span>;        <span class="cm">/* fișier .txt ✓ */</span>
+
+<span class="cm">/* WORK = bibliotecă temporară */</span>
+<span class="kw">data</span> <span class="var">work.temp</span>;  <span class="cm">/* sau */</span>  <span class="kw">data</span> <span class="var">temp</span>;  <span class="cm">/* ambele sunt WORK */</span>
+<span class="cm">/* Fișier temporar = UN singur nivel (temp), nu mylib.temp */</span>
+<span class="cm">/* Sters la închiderea sesiunii SAS */</span></code></pre>
+  </section>
+
+  <!-- ====== DATA STEP ====== -->
+  <section class="section" id="data">
+    <h2 class="sec-title">DATA Step — Citire date</h2>
+    <pre><code><span class="cm">/* Delimitare prin spațiu (implicit) */</span>
+<span class="kw">data</span> <span class="var">produse</span>;
+    <span class="kw">infile</span> <span class="str">'/home/user/produse.txt'</span>;
+    <span class="kw">input</span> <span class="var">Nume</span> $ <span class="var">Pret</span> <span class="var">Categorie</span> $;
+<span class="kw">run</span>;
+
+<span class="cm">/* Delimitare prin virgulă — DSD */</span>
+<span class="kw">data</span> <span class="var">produse</span>;
+    <span class="kw">infile</span> <span class="str">'/home/user/produse.csv'</span> <span class="kw">DSD</span>;
+    <span class="kw">input</span> <span class="var">Nume</span> $ <span class="var">Pret</span> <span class="var">Categorie</span> $;
+<span class="kw">run</span>;
+<span class="cm">/* DSD: delimitator = virgulă; 2 virgule = valoare lipsă; ghilimele pentru câmpuri */</span>
+
+<span class="cm">/* Alt delimitator */</span>
+<span class="kw">infile</span> <span class="str">'...'</span> <span class="kw">DLM</span>=<span class="str">'*'</span>;   <span class="cm">/* DLM = DELIMITER */</span>
+
+<span class="cm">/* DATALINES — date în cod */</span>
+<span class="kw">data</span> <span class="var">test</span>;
+    <span class="kw">input</span> <span class="var">Cod</span> <span class="var">Nota</span>;
+<span class="kw">datalines</span>;
+1 8
+2 7
+3 9
+;
+
+<span class="cm">/* Column input (lățime fixă) */</span>
+<span class="kw">input</span> <span class="var">Nume</span> $ <span class="num">1</span>-<span class="num">8</span>  <span class="var">Pret</span> <span class="num">9</span>-<span class="num">11</span>  <span class="var">Cat</span> $ <span class="num">12</span>-<span class="num">19</span>;
+<span class="cm">/* Poate citi în orice ordine; valori lipsă = spații libere */</span>
+
+<span class="cm">/* Formatted input */</span>
+<span class="kw">input</span> @<span class="num">1</span> <span class="var">Nume</span> $<span class="num">8</span>. @<span class="num">9</span> <span class="var">Pret</span> <span class="fn">dollar4</span>. @<span class="num">13</span> <span class="var">Cat</span> $<span class="num">8</span>.;
+<span class="cm">/* @ = poziția de start; format la final */</span>
+
+<span class="cm">/* @@ — mai multe înregistrări pe aceeași linie */</span>
+<span class="kw">input</span> <span class="var">Varsta</span> @@;</code></pre>
+  </section>
+
+  <!-- ====== SET MERGE APPEND ====== -->
+  <section class="section" id="set">
+    <h2 class="sec-title">SET, MERGE, PROC APPEND</h2>
+    <table>
+      <tr><th>Operație</th><th>Sintaxă</th><th>Rezultat</th></tr>
+      <tr><td><strong>Concatenare</strong></td><td><code>set a b;</code></td><td>Rândurile lui b după rândurile lui a</td></tr>
+      <tr><td><strong>Interclasare</strong></td><td><code>set a b; by x;</code></td><td>Concatenare + sortare după x</td></tr>
+      <tr><td><strong>Fuziune</strong></td><td><code>merge a b; by x;</code></td><td>Join pe variabila x</td></tr>
+      <tr><td><strong>Adăugare</strong></td><td><code>proc append base=a data=b;</code></td><td>Adaugă b la a (nu citește setul de bază)</td></tr>
+    </table>
+
+    <pre><code><span class="cm">/* Concatenare — alipire observații */</span>
+<span class="kw">data</span> <span class="var">total</span>;
+    <span class="kw">set</span> <span class="var">tabel1</span> <span class="var">tabel2</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Interclasare — necesită sortare prealabilă! */</span>
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">a</span>; <span class="kw">by</span> <span class="var">ID</span>; <span class="kw">run</span>;
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">b</span>; <span class="kw">by</span> <span class="var">ID</span>; <span class="kw">run</span>;
+<span class="kw">data</span> <span class="var">total</span>;
+    <span class="kw">set</span> <span class="var">a</span> <span class="var">b</span>; <span class="kw">by</span> <span class="var">ID</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Fuziune — JOIN pe variabilă comună */</span>
+<span class="kw">data</span> <span class="var">rezultat</span>;
+    <span class="kw">merge</span> <span class="var">clienti</span> <span class="var">plati</span>;
+    <span class="kw">by</span> <span class="var">IDClient</span>;
+<span class="kw">run</span>;
+<span class="cm">/* Fără IF = TOATE observațiile (cum ar fi outer join) */</span>
+
+<span class="cm">/* PROC APPEND — adaugă b la a (nu recitește a) */</span>
+<span class="kw">proc append</span> <span class="var">base</span>=<span class="var">myset</span> <span class="var">data</span>=<span class="var">new_obs</span>; <span class="kw">run</span>;</code></pre>
+  </section>
+
+  <!-- ====== IN= ====== -->
+  <section class="section" id="in">
+    <h2 class="sec-title">⚠️ IN= — Variabile de corespondență</h2>
+    <pre><code><span class="kw">data</span> <span class="var">rezultat</span>;
+    <span class="kw">merge</span> <span class="var">a</span>(<span class="kw">in</span>=<span class="var">inA</span>) <span class="var">b</span>(<span class="kw">in</span>=<span class="var">inB</span>);
+    <span class="kw">by</span> <span class="var">ID</span>;
+    <span class="cm">/* inA=1 dacă ID există în a; inB=1 dacă ID există în b */</span>
+<span class="kw">run</span>;</code></pre>
+
+    <table>
+      <tr><th>Condiție</th><th>Echivalent SQL</th><th>Rezultat</th></tr>
+      <tr><td><code>if inA and inB;</code></td><td>INNER JOIN</td><td>Doar ID-urile comune</td></tr>
+      <tr><td><code>if inA and not inB;</code></td><td>LEFT ANTI JOIN</td><td>Doar în A, nu și în B</td></tr>
+      <tr><td><code>if not inA and inB;</code></td><td>RIGHT ANTI JOIN</td><td>Doar în B, nu și în A</td></tr>
+      <tr><td><code>if inA or inB;</code></td><td>FULL OUTER JOIN</td><td>Toate (același cu fără IF)</td></tr>
+    </table>
+
+    <div class="tip">
+      IN= creează variabile <strong>TEMPORARE</strong> (0 sau 1) care nu apar în setul de date de ieșire.
+    </div>
+  </section>
+
+  <!-- ====== IF SELECT ====== -->
+  <section class="section" id="if">
+    <h2 class="sec-title">IF / ELSE IF / SELECT</h2>
+    <pre><code><span class="cm">/* IF-THEN */</span>
+<span class="kw">if</span> <span class="var">Varsta</span> <span class="kw">lt</span> <span class="num">20</span> <span class="kw">then</span> <span class="var">Grupa</span> = <span class="num">1</span>;
+<span class="kw">else if</span> <span class="var">Varsta</span> <span class="kw">lt</span> <span class="num">40</span> <span class="kw">then</span> <span class="var">Grupa</span> = <span class="num">2</span>;
+<span class="kw">else</span> <span class="var">Grupa</span> = <span class="num">3</span>;
+<span class="cm">/* ⚠️ ELSE IF este esențial — IF-uri independente ar suprascrie greșit */</span>
+
+<span class="cm">/* IF cu grup DO */</span>
+<span class="kw">if</span> <span class="var">Nota</span> >= <span class="num">5</span> <span class="kw">then do</span>;
+    <span class="var">Status</span> = <span class="str">'Promovat'</span>;
+    <span class="var">Bonus</span> = <span class="num">100</span>;
+<span class="kw">end</span>;
+
+<span class="cm">/* IF fără THEN = subset (filtrare) */</span>
+<span class="kw">if</span> <span class="var">Sex</span> <span class="kw">eq</span> <span class="str">'F'</span>;   <span class="cm">/* păstrează DOAR rândurile unde Sex='F' */</span>
+
+<span class="cm">/* DELETE */</span>
+<span class="kw">if missing</span>(<span class="var">Varsta</span>) <span class="kw">then delete</span>;   <span class="cm">/* nu adaugă rândul */</span>
+
+<span class="cm">/* SELECT */</span>
+<span class="kw">select</span>(<span class="var">Categorie</span>);
+    <span class="kw">when</span> (<span class="str">'legume'</span>, <span class="str">'fructe'</span>) <span class="var">Reducere</span> = <span class="num">0.25</span>;
+    <span class="kw">when</span> (<span class="str">'cosmetice'</span>) <span class="var">Reducere</span> = <span class="num">0.30</span>;
+    <span class="kw">otherwise</span> <span class="var">Reducere</span> = <span class="num">0</span>;
+<span class="kw">end</span>;
+<span class="cm">/* Fără OTHERWISE și toate false → EROARE! */</span></code></pre>
+  </section>
+
+  <!-- ====== WHERE VS IF ====== -->
+  <section class="section" id="where">
+    <h2 class="sec-title">⚠️ WHERE vs IF</h2>
+    <table>
+      <tr><th>Caracteristică</th><th>WHERE</th><th>IF (fără THEN)</th></tr>
+      <tr><td>Disponibil în PROC</td><td>✅ DA</td><td>❌ NU</td></tr>
+      <tr><td>Variabile create în DATA step</td><td>❌ NU (doar din setul de intrare)</td><td>✅ DA</td></tr>
+      <tr><td>Operatori speciali</td><td>IS MISSING, BETWEEN, CONTAINS, LIKE</td><td>Operatori standard</td></tr>
+    </table>
+
+    <pre><code><span class="cm">/* WHERE operatori speciali */</span>
+<span class="kw">where</span> <span class="var">Varsta</span> <span class="kw">is missing</span>;                  <span class="cm">/* valoare lipsă */</span>
+<span class="kw">where</span> <span class="var">Nota</span> <span class="kw">between</span> <span class="num">5</span> <span class="kw">and</span> <span class="num">10</span>;            <span class="cm">/* interval INCLUSIV */</span>
+<span class="kw">where</span> <span class="var">Adresa</span> <span class="kw">contains</span> <span class="str">'Str'</span>;             <span class="cm">/* conține subșirul */</span>
+<span class="kw">where</span> <span class="var">Nume</span> <span class="kw">like</span> <span class="str">'A_e%'</span>;                  <span class="cm">/* sablon: _ = un car., % = oricâte */</span>
+<span class="kw">where</span> <span class="var">Style</span> <span class="kw">in</span> (<span class="str">'RANCH'</span>, <span class="str">'SPLIT'</span>);       <span class="cm">/* lista de valori */</span>
+
+<span class="cm">/* Operatori comparație */</span>
+<span class="kw">where</span> <span class="var">Suma</span> <= <span class="num">5000</span> <span class="kw">and</span> (<span class="var">Cont</span>=<span class="str">'101'</span> <span class="kw">or</span> <span class="var">Rata</span> <span class="kw">eq</span> <span class="num">0.095</span>);
+<span class="cm">/* = EQ, ^= NE, < LT, <= LE, > GT, >= GE */</span></code></pre>
+  </section>
+
+  <!-- ====== DO WHILE UNTIL ====== -->
+  <section class="section" id="do">
+    <h2 class="sec-title">DO / WHILE / UNTIL / OUTPUT</h2>
+    <pre><code><span class="cm">/* DO cu contor */</span>
+<span class="kw">do</span> i = <span class="num">1</span> <span class="kw">to</span> <span class="num">5</span>;
+    ...
+<span class="kw">end</span>;
+
+<span class="kw">do</span> i = <span class="num">1</span> <span class="kw">to</span> <span class="num">10</span> <span class="kw">by</span> <span class="num">2</span>;   <span class="cm">/* pas = 2: 1,3,5,7,9 */</span>
+<span class="kw">do</span> i = <span class="num">10</span> <span class="kw">to</span> <span class="num">1</span> <span class="kw">by</span> -<span class="num">1</span>;  <span class="cm">/* descrescător */</span>
+
+<span class="cm">/* DO WHILE — verificare ANTERIOARĂ */</span>
+<span class="kw">do while</span> (<span class="var">i</span> <= <span class="num">10</span>);
+    ...  <span class="cm">/* s-ar putea să nu se execute deloc */</span>
+<span class="kw">end</span>;
+
+<span class="cm">/* DO UNTIL — verificare POSTERIOARĂ */</span>
+<span class="kw">do until</span> (<span class="var">i</span> > <span class="num">10</span>);
+    ...  <span class="cm">/* se execută MINIM O DATĂ */</span>
+<span class="kw">end</span>;</code></pre>
+
+    <pre><code><span class="cm">/* OUTPUT în buclă — scrie un rând la fiecare iterație */</span>
+<span class="kw">data</span> <span class="var">lunar</span>;
+    <span class="kw">do</span> luna = <span class="num">1</span> <span class="kw">to</span> <span class="num">12</span>;
+        <span class="var">Vanzari</span> = <span class="var">Vanzari_medii</span> * luna;
+        <span class="kw">output</span>;   <span class="cm">/* scrie rândul pentru fiecare lună */</span>
+    <span class="kw">end</span>;
+<span class="kw">run</span>;</code></pre>
+
+    <h3 class="sub-title">Acumulator SUM (sum statement)</h3>
+    <pre><code><span class="cm">/* var + expresie; (fără =) = acumulator */</span>
+<span class="var">Total</span> + <span class="var">Venit</span>;
+<span class="cm">/* - Inițializat automat cu 0 (nu cu .)</span>
+<span class="cm">   - Reține valoarea de la o observație la alta</span>
+<span class="cm">   - Ignoră valorile NULL (lipsă)</span>
+<span class="cm">   - Rolul: sumă cumulată */</span></code></pre>
+    <div class="tip">
+      <code>Total + Venit;</code> ≠ <code>Total = Total + Venit;</code>. Prima este <strong>sum statement</strong> (acumulator persistent). A doua este o atribuire normală (pierde valoarea la rândul următor dacă nu e inițializată).
+    </div>
+  </section>
+
+  <!-- ====== FORMATE ====== -->
+  <section class="section" id="formate">
+    <h2 class="sec-title">⚠️ Formate & PROC FORMAT</h2>
+    <div class="card" style="border-color:var(--yellow);">
+      <ul style="margin-left:20px;line-height:2;">
+        <li>Formatul de afișare <strong>conține punct (.)</strong> și se aplică unei <strong>variabile</strong></li>
+        <li>Afectează <strong>modul de afișare</strong>, NU datele stocate</li>
+        <li>Formatul de citire (informat) = folosit la INPUT</li>
+        <li>Formatul de afișare = folosit la FORMAT, PUT</li>
+      </ul>
+    </div>
+
+    <pre><code><span class="cm">/* Formate predefinite */</span>
+<span class="kw">format</span> <span class="var">Salary</span> <span class="fn">dollar10.2</span>;         <span class="cm">/* $108,255.00 */</span>
+<span class="kw">format</span> <span class="var">DataComanda</span> <span class="fn">date7</span>.;          <span class="cm">/* 11JAN24 */</span>
+<span class="kw">format</span> <span class="var">DataComanda</span> <span class="fn">mmddyy8</span>.;        <span class="cm">/* 01/11/24 */</span>
+
+<span class="cm">/* PROC FORMAT — formate utilizator */</span>
+<span class="kw">proc format</span>;
+    <span class="cm">/* Format NUMERIC */</span>
+    <span class="kw">value</span> <span class="var">nota</span>
+        low-<span class="num">4.4</span> = <span class="str">'Picat'</span>
+        <span class="num">4.5</span>-high = <span class="str">'Promovat'</span>;
+
+    <span class="cm">/* Format NUMERIC cu intervale */</span>
+    <span class="kw">value</span> <span class="var">nivel_punctaj</span>
+        low-<span class="kw">&lt;</span><span class="num">50</span> = <span class="str">'Scazut'</span>
+        <span class="num">50</span>-<span class="kw">&lt;</span><span class="num">80</span> = <span class="str">'Mediu'</span>
+        <span class="num">80</span>-high = <span class="str">'Ridicat'</span>;
+
+    <span class="cm">/* Format CARACTER — $ prefix */</span>
+    <span class="kw">value</span> $<span class="var">gen</span>
+        <span class="str">'M'</span> = <span class="str">'Masculin'</span>
+        <span class="str">'F'</span> = <span class="str">'Feminin'</span>
+        <span class="kw">other</span> = <span class="str">'Necunoscut'</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Aplicare format */</span>
+<span class="kw">format</span> <span class="var">Nota</span> <span class="var">nota</span>.;        <span class="cm">/* punct obligatoriu la final! */</span>
+<span class="kw">format</span> <span class="var">Gen</span> $<span class="var">gen</span>.;         <span class="cm">/* format caracter */</span>
+
+<span class="cm">/* Formate persistente — salvate în bibliotecă */</span>
+<span class="kw">libname</span> <span class="var">formate</span> <span class="str">'/home/user/fmts'</span>;
+<span class="kw">options fmtsearch</span>=(<span class="var">formate</span>);
+<span class="kw">proc format library</span>=<span class="var">formate</span>;
+    <span class="kw">value</span> <span class="var">pl</span> low-<span class="num">10</span>=<span class="str">'acceptabil'</span> <span class="num">11</span>-high=<span class="str">'peste limita'</span>;
+<span class="kw">run</span>;</code></pre>
+    <div class="info">
+      PROC FREQ numără valorile <strong>formatate</strong>. Dacă există format aplicat pe variabilă, frecvențele sunt grupate conform formatului.
+    </div>
+  </section>
+
+  <!-- ====== PUT VS INPUT ====== -->
+  <section class="section" id="put_input">
+    <h2 class="sec-title">⚠️ PUT vs INPUT</h2>
+    <div class="grid2">
+      <div class="mini-card">
+        <h4>PUT → numeric la CARACTER</h4>
+        <pre style="margin:8px 0 0"><code><span class="var">VarChar</span> = <span class="fn">PUT</span>(<span class="var">VarNum</span>, <span class="fn">dollar10.2</span>);
+<span class="cm">/* Returnează STRING */</span>
+<span class="cm">/* Folosește format afișare */</span></code></pre>
+      </div>
+      <div class="mini-card">
+        <h4>INPUT → caracter la NUMERIC</h4>
+        <pre style="margin:8px 0 0"><code><span class="var">VarNum</span> = <span class="fn">INPUT</span>(<span class="var">VarChar</span>, <span class="fn">dollar10.2</span>);
+<span class="cm">/* Returnează NUMĂR */</span>
+<span class="cm">/* Folosește informat de citire */</span></code></pre>
+      </div>
+    </div>
+    <div class="danger">
+      <code>PUT</code> = numeric → <strong>caracter</strong> (afișare). <code>INPUT</code> = caracter → <strong>numeric</strong> (citire).
+      <br>Examenul confundă frecvent cele două!
+    </div>
+  </section>
+
+  <!-- ====== PROC SORT ====== -->
+  <section class="section" id="proc_sort">
+    <h2 class="sec-title">PROC SORT</h2>
+    <pre><code><span class="cm">/* Sortare simplă */</span>
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">studenti</span>;
+    <span class="kw">by</span> <span class="var">Nota</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Descrescător pe 2 variabile — descending se REPETĂ */</span>
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">angajati</span>;
+    <span class="kw">by descending</span> <span class="var">Postal_Code</span> <span class="kw">descending</span> <span class="var">Employee_ID</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Salvare în set nou */</span>
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">a</span> <span class="var">out</span>=<span class="var">b</span>;
+    <span class="kw">by</span> <span class="var">ID</span>;
+<span class="kw">run</span>;</code></pre>
+    <div class="danger">
+      <code>proc sort data=studenti; run;</code> fără <code>BY</code> → <strong>EROARE</strong> (BY este obligatoriu)
+    </div>
+  </section>
+
+  <!-- ====== PROC MEANS ====== -->
+  <section class="section" id="proc_means">
+    <h2 class="sec-title">PROC MEANS</h2>
+    <pre><code><span class="cm">/* Statistici descriptive */</span>
+<span class="kw">proc means</span> <span class="var">data</span>=<span class="var">studenti</span>;
+    <span class="kw">var</span> <span class="var">Nota1</span> <span class="var">Nota2</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Cu grupuri (necesită SORT prealabil!) */</span>
+<span class="kw">proc sort</span> <span class="var">data</span>=<span class="var">vanzari</span>; <span class="kw">by</span> <span class="var">LunaComanda</span>; <span class="kw">run</span>;
+<span class="kw">proc means</span> <span class="var">data</span>=<span class="var">vanzari</span> <span class="kw">mean</span>;
+    <span class="kw">by</span> <span class="var">LunaComanda</span>;
+    <span class="kw">var</span> <span class="var">ValoareVanzare</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Salvare rezultate */</span>
+<span class="kw">proc means</span> <span class="kw">noprint</span> <span class="var">data</span>=<span class="var">achizitii</span>;
+    <span class="kw">by</span> <span class="var">IDCumparator</span>;
+    <span class="kw">var</span> <span class="var">Valoare</span>;
+    <span class="kw">output out</span>=<span class="var">rezumat</span> <span class="fn">sum</span>(<span class="var">Valoare</span>)=<span class="var">Total</span> <span class="fn">mean</span>(<span class="var">Valoare</span>)=<span class="var">Medie</span>;
+<span class="kw">run</span>;
+<span class="cm">/* noprint = fără raport pe ecran; output out= = salvare */</span>
+<span class="cm">/* range mean nonobs maxdec=1 = opțiuni statistici */</span></code></pre>
+  </section>
+
+  <!-- ====== PROC FREQ ====== -->
+  <section class="section" id="proc_freq">
+    <h2 class="sec-title">PROC FREQ</h2>
+    <pre><code><span class="cm">/* Frecvențe simple */</span>
+<span class="kw">proc freq</span> <span class="var">data</span>=<span class="var">studenti</span>;
+    <span class="kw">tables</span> <span class="var">Sex</span>;
+<span class="kw">run</span>;
+
+<span class="cm">/* Cu format aplicat — numără valorile FORMATATE */</span>
+<span class="kw">proc freq</span> <span class="var">data</span>=<span class="var">candidati</span>;
+    <span class="kw">tables</span> <span class="var">Punctaj</span> / <span class="kw">nocum</span>;
+    <span class="kw">format</span> <span class="var">Punctaj</span> <span class="var">nivel_punctaj</span>.;
+<span class="kw">run</span>;
+<span class="cm">/* nocum = fără frecvențe cumulative */</span>
+
+<span class="cm">/* Creare set de ieșire */</span>
+<span class="kw">proc freq</span> <span class="var">data</span>=<span class="var">a</span>;
+    <span class="kw">tables</span> <span class="var">Categorie</span> / <span class="kw">out</span>=<span class="var">frecvente</span>;
+<span class="kw">run</span>;</code></pre>
+    <div class="info">
+      PROC FREQ numără atât variabile caracter cât și numerice. Numără valorile <strong>formatate</strong> dacă există format aplicat.
+    </div>
+  </section>
+
+  <!-- ====== PROC PRINT ====== -->
+  <section class="section" id="proc_print">
+    <h2 class="sec-title">PROC PRINT & TITLE</h2>
+    <pre><code><span class="kw">proc print</span> <span class="var">data</span>=<span class="var">studenti</span>;
+    <span class="kw">var</span> <span class="var">Nume</span> <span class="var">Nota</span>;           <span class="cm">/* afișează DOAR aceste variabile */</span>
+    <span class="kw">where</span> <span class="var">Sex</span> <span class="kw">eq</span> <span class="str">'F'</span>;         <span class="cm">/* filtrare — WHERE valid în PROC */</span>
+    <span class="kw">by</span> <span class="var">Gen</span>;                    <span class="cm">/* necesită date sortate după Gen */</span>
+    <span class="kw">label</span>;                     <span class="cm">/* afișează etichetele coloanelor */</span>
+<span class="kw">run</span>;
+
+<span class="cm">/* TITLE */</span>
+<span class="kw">title1</span> <span class="str">"Raport principal"</span>;
+<span class="kw">title2</span> <span class="str">"Subtitlu"</span>;
+
+<span class="kw">title</span>;   <span class="cm">/* fără număr = RESETEAZĂ TOATE titlurile */</span>
+<span class="cm">/* Rapoartele după title; NU au titlu */</span></code></pre>
+    <div class="warn">
+      <code>title;</code> (fără număr și fără text) <strong>RESETEAZĂ</strong> toate titlurile anterioare. Rapoartele după această linie nu vor mai afișa niciun titlu.
+    </div>
+  </section>
+
+  <!-- ====== PROC SQL ====== -->
+  <section class="section" id="proc_sql">
+    <h2 class="sec-title">PROC SQL</h2>
+    <pre><code><span class="kw">proc sql</span>;
+    <span class="cm">/* Creare tabel din join */</span>
+    <span class="kw">create table</span> <span class="var">rezultat</span> <span class="kw">as</span>
+    <span class="kw">select</span> * <span class="kw">from</span> <span class="var">proiecte</span> p
+    <span class="kw">inner join</span> <span class="var">echipe</span> e <span class="kw">on</span> p.<span class="var">IDProiect</span> = e.<span class="var">IDProiect</span>;
+
+    <span class="cm">/* Full join */</span>
+    <span class="kw">select</span> * <span class="kw">from</span> <span class="var">a</span> <span class="kw">full join</span> <span class="var">b</span> <span class="kw">on</span> a.<span class="var">ID</span> = b.<span class="var">ID</span>;
+
+    <span class="cm">/* Left join + IS NULL = fără corespondent */</span>
+    <span class="kw">select</span> a.* <span class="kw">from</span> <span class="var">abonati</span> a
+    <span class="kw">left join</span> <span class="var">plati</span> p <span class="kw">on</span> a.<span class="var">ID</span> = p.<span class="var">ID</span>
+    <span class="kw">where</span> p.<span class="var">ID</span> <span class="kw">is null</span>;   <span class="cm">/* abonați fără plăți */</span>
+
+    <span class="cm">/* Grupare */</span>
+    <span class="kw">select</span> <span class="var">Regiune</span>, <span class="fn">avg</span>(<span class="var">Vanzari</span>) <span class="kw">from</span> <span class="var">date</span> <span class="kw">group by</span> <span class="var">Regiune</span>;
+<span class="kw">quit</span>;</code></pre>
+  </section>
+
+  <!-- ====== ARRAYS ====== -->
+  <section class="section" id="arrays">
+    <h2 class="sec-title">⚠️ ARRAY</h2>
+    <pre><code><span class="cm">/* Definire array — acces la variabile cu indici */</span>
+<span class="kw">array</span> <span class="var">raspunsuri</span>{<span class="num">6</span>} <span class="var">Q1</span>-<span class="var">Q6</span>;
+<span class="cm">/* Crează referință la variabilele Q1, Q2, Q3, Q4, Q5, Q6 */</span>
+
+<span class="cm">/* Iterare array */</span>
+<span class="kw">do</span> i = <span class="num">1</span> <span class="kw">to</span> <span class="num">6</span>;
+    <span class="kw">if</span> <span class="var">raspunsuri</span>{i} = <span class="num">0</span> <span class="kw">then</span> <span class="var">raspunsuri</span>{i} = .;
+<span class="kw">end</span>;
+<span class="cm">/* Înlocuiește 0 cu valoare lipsă pentru Q1-Q6 */</span>
+
+<span class="cm">/* DIM — numărul elementelor */</span>
+<span class="kw">do</span> i = <span class="num">1</span> <span class="kw">to</span> <span class="fn">dim</span>(<span class="var">raspunsuri</span>);  <span class="cm">/* = do i = 1 to 6; */</span>
+
+<span class="cm">/* Array 2D */</span>
+<span class="kw">array</span> <span class="var">matrice</span>{<span class="num">3</span>, <span class="num">4</span>};   <span class="cm">/* 3 rânduri, 4 coloane */</span>
+
+<span class="cm">/* _temporary_ — nu creează variabile în setul de date */</span>
+<span class="kw">array</span> <span class="var">limite</span>{<span class="num">3</span>} _<span class="var">temporary_</span> (<span class="num">5</span> <span class="num">7</span> <span class="num">9</span>);</code></pre>
+  </section>
+
+  <!-- ====== MACRO ====== -->
+  <section class="section" id="macro">
+    <h2 class="sec-title">Macro-uri</h2>
+    <pre><code><span class="cm">/* Variabilă macro */</span>
+%<span class="kw">let</span> <span class="var">an</span> = <span class="num">2024</span>;
+<span class="kw">data</span> <span class="var">studenti_&amp;an</span>;  <span class="cm">/* &amp; = referință la variabilă macro */</span>
+
+<span class="cm">/* Macro program */</span>
+%<span class="kw">macro</span> <span class="fn">raport</span>(set, var);
+    <span class="kw">proc means</span> <span class="var">data</span>=<span class="var">&amp;set</span>;
+        <span class="kw">var</span> <span class="var">&amp;var</span>;
+    <span class="kw">run</span>;
+%<span class="kw">mend</span>;
+%<span class="fn">raport</span>(<span class="var">studenti</span>, <span class="var">Nota</span>);
+
+<span class="cm">/* CALL SYMPUT — creare variabilă macro din date */</span>
+<span class="kw">call symput</span>(<span class="str">'maxim'</span>, <span class="var">Nota</span>);
+
+<span class="cm">/* Variabile macro speciale */</span>
+<span class="var">&amp;SYSDATE</span>   <span class="cm">/* data curentă */</span>
+<span class="var">&amp;SYSDAY</span>    <span class="cm">/* ziua săptămânii */</span></code></pre>
+  </section>
+
+  <!-- ====== FUNCTII ====== -->
+  <section class="section" id="functii">
+    <h2 class="sec-title">Funcții SAS</h2>
+    <table>
+      <tr><th>Funcție</th><th>Utilizare</th><th>Detalii</th></tr>
+      <tr><td><code>SUM(a,b,...)</code></td><td>Sumă</td><td>Ignoră valorile lipsă (.) — diferit de a+b+c!</td></tr>
+      <tr><td><code>MONTH(data)</code></td><td>Luna</td><td>Returnează 1-12</td></tr>
+      <tr><td><code>YRDIF(d1,d2,'ACTUAL')</code></td><td>Vechime</td><td>Diferența în ani</td></tr>
+      <tr><td><code>MISSING(x)</code></td><td>Verificare lipsă</td><td>True dacă valoarea lipsă</td></tr>
+      <tr><td><code>TODAY()</code></td><td>Data curentă</td><td>Returnează data SAS curentă</td></tr>
+      <tr><td><code>SUBSTR(x,p,l)</code></td><td>Subșir</td><td>Pornind de la poziția p, lungime l</td></tr>
+      <tr><td><code>LENGTH(x)</code></td><td>Lungime</td><td>Numărul de caractere</td></tr>
+      <tr><td><code>CATS(a,b,...)</code></td><td>Concatenare</td><td>Fără spații în plus</td></tr>
+      <tr><td><code>PUT(x, fmt.)</code></td><td>Numeric→Char</td><td>Returnează caracter</td></tr>
+      <tr><td><code>INPUT(x, fmt.)</code></td><td>Char→Numeric</td><td>Returnează număr</td></tr>
+    </table>
+
+    <pre><code><span class="cm">/* Exemplu YRDIF pentru calcul vechime */</span>
+<span class="var">Vechime</span> = <span class="fn">YRDIF</span>(<span class="var">DataAngajare</span>, <span class="fn">TODAY</span>(), <span class="str">'ACTUAL'</span>);
+
+<span class="cm">/* Constantă dată */</span>
+<span class="var">d</span> = <span class="str">'17dec2018'd</span>;   <span class="cm">/* dată literal */</span>
+
+<span class="cm">/* Notă finală ponderată */</span>
+<span class="var">Nota</span> = <span class="fn">SUM</span>(<span class="var">Proiect</span>*<span class="num">0.3</span> + <span class="var">Activitate</span>*<span class="num">0.2</span> + <span class="var">Examen</span>*<span class="num">0.5</span>);</code></pre>
+  </section>
+
+  <!-- ====== TRAPS ====== -->
+  <section class="section" id="traps">
+    <h2 class="sec-title">⚠️ Capcane frecvente la examen</h2>
+    <div class="card" style="border-color:var(--red);">
+      <table>
+        <tr><th>Situație</th><th>Răspuns Corect</th></tr>
+        <tr><td>LIBNAME pe fișier .txt</td><td>❌ EROARE — LIBNAME pe DIRECTOR</td></tr>
+        <tr><td>INFILE pe director</td><td>❌ EROARE — INFILE pe FIȘIER</td></tr>
+        <tr><td>PROC SORT fără BY</td><td>❌ EROARE</td></tr>
+        <tr><td>IF în secțiune PROC</td><td>❌ NU funcționează — folosiți WHERE</td></tr>
+        <tr><td>title; (fără număr)</td><td>RESETEAZĂ TOATE titlurile</td></tr>
+        <tr><td>Variabile din DROP</td><td>Disponibile pentru calcul, eliminate la OUTPUT</td></tr>
+        <tr><td>SET = concatenare</td><td>NU este fuziune (fuziune = MERGE+BY)</td></tr>
+        <tr><td>PROC APPEND base=a data=b</td><td>NU citește setul de bază a; adaugă b</td></tr>
+        <tr><td>PUT returnează</td><td>Valoare CARACTER (numeric→char)</td></tr>
+        <tr><td>descending la PROC SORT</td><td>Se repetă pentru fiecare variabilă</td></tr>
+        <tr><td>MERGE fără IF</td><td>OUTER JOIN (toate observațiile)</td></tr>
+        <tr><td>MERGE + if inA and inB</td><td>INNER JOIN</td></tr>
+        <tr><td>WHERE variabile create în DATA</td><td>❌ NU funcționează — folosiți IF</td></tr>
+        <tr><td>Fișiere temporare SAS</td><td>Nume pe UN singur nivel (bibliotecă WORK)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">Module SAS</h3>
+      <table>
+        <tr><th>Modul</th><th>Funcționalitate</th></tr>
+        <tr><td>Base SAS</td><td>Prelucrare date, rapoarte de bază</td></tr>
+        <tr><td>SAS/STAT</td><td>Analiză statistică</td></tr>
+        <tr><td>SAS/GRAPH</td><td>Grafice</td></tr>
+        <tr><td>SAS/OR</td><td>Cercetare operațională</td></tr>
+        <tr><td>SAS/ETS</td><td>Serii de timp</td></tr>
+        <tr><td>SAS/IML</td><td>Limbaj matrice interactiv</td></tr>
+        <tr><td>SAS/QC</td><td>Controlul calității</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('#nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>

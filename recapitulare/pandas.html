@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Recapitulare PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;
+  --text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;
+  --green:#10b981;--yellow:#f59e0b;--red:#ef4444;--orange:#f97316;--blue:#3b82f6;
+  --code-bg:#0d1117;
+  --warn-bg:#2d2200;--warn-border:#f59e0b;
+  --tip-bg:#002d1a;--tip-border:#10b981;
+  --danger-bg:#2d0505;--danger-border:#ef4444;
+  --info-bg:#001a2d;--info-border:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+#nav{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:100;}
+#nav h2{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:0 20px 12px;}
+#nav a{display:block;padding:7px 20px;color:var(--text-muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .2s;}
+#nav a:hover,#nav a.active{color:var(--accent-light);border-left-color:var(--accent);background:rgba(99,102,241,.08);}
+#nav .section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;padding:16px 20px 4px;}
+#main{margin-left:260px;padding:40px 48px;max-width:960px;}
+.page-title{font-size:32px;font-weight:700;margin-bottom:6px;background:linear-gradient(135deg,#38bdf8,var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.page-sub{color:var(--text-muted);font-size:15px;margin-bottom:40px;}
+.section{margin-bottom:48px;scroll-margin-top:80px;}
+h2.sec-title{font-size:20px;font-weight:600;color:var(--accent-light);border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px;}
+h3.sub-title{font-size:15px;font-weight:600;color:var(--text);margin:20px 0 10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;margin:12px 0;}
+code{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre code{background:none;padding:0;color:var(--text);}
+.kw{color:#c084fc;}.fn{color:#38bdf8;}.str{color:#86efac;}.num{color:#fb923c;}.cm{color:#475569;}.var{color:#e2e8f0;}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.warn::before{content:"⚠️ ATENȚIE: ";font-weight:700;color:var(--yellow);}
+.tip{background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.tip::before{content:"✓ REȚINE: ";font-weight:700;color:var(--green);}
+.danger{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.danger::before{content:"✗ EROARE FRECVENTĂ: ";font-weight:700;color:var(--red);}
+.info{background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;padding:14px 18px;margin:12px 0;}
+.info::before{content:"ℹ INFO: ";font-weight:700;color:var(--blue);}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th{background:var(--surface2);color:var(--accent-light);padding:10px 14px;text-align:left;font-weight:600;border:1px solid var(--border);}
+td{padding:9px 14px;border:1px solid var(--border);}
+tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+.compare-box{background:var(--surface2);border-radius:8px;padding:14px;}
+.compare-box h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.compare-box.ok h4{color:var(--green);}.compare-box.bad h4{color:var(--red);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:900px){#nav{display:none;}#main{margin-left:0;padding:24px 20px;}}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <h2>PSW — Pandas</h2>
+  <div class="section-label">Baze</div>
+  <a href="#import">Import / Export</a>
+  <a href="#explorare">Explorare</a>
+  <div class="section-label">Selectie</div>
+  <a href="#loc">loc vs iloc ⚠️</a>
+  <a href="#filtrare">Filtrare</a>
+  <div class="section-label">Prelucrare</div>
+  <a href="#missing">Valori Lipsă</a>
+  <a href="#groupby">GroupBy</a>
+  <a href="#merge">Merge / Concat</a>
+  <a href="#apply">Apply / Map</a>
+  <div class="section-label">Transformari</div>
+  <a href="#date">Date & Time</a>
+  <a href="#binning">Binning (cut)</a>
+  <a href="#drop">Drop / Set Index</a>
+  <div class="section-label">Capcane</div>
+  <a href="#traps">Capcane frecvente</a>
+</nav>
+
+<main id="main">
+  <h1 class="page-title">Pandas — Recapitulare</h1>
+  <p class="page-sub">DataFrame, Series, loc/iloc, merge, groupby și toate capcanele</p>
+
+  <!-- ====== IMPORT ====== -->
+  <section class="section" id="import">
+    <h2 class="sec-title">Import / Export</h2>
+    <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Citire</span>
+df = pd.<span class="fn">read_csv</span>(<span class="str">"fisier.csv"</span>)
+df = pd.<span class="fn">read_csv</span>(<span class="str">"fisier.csv"</span>, usecols=[<span class="str">"col1"</span>, <span class="str">"col2"</span>])  <span class="cm"># doar anumite coloane</span>
+df = pd.<span class="fn">read_excel</span>(<span class="str">"fisier.xlsx"</span>)
+
+<span class="cm"># Scriere</span>
+df.<span class="fn">to_csv</span>(<span class="str">"out.csv"</span>, index=<span class="kw">False</span>)      <span class="cm"># salvare CSV fără index</span>
+df.<span class="fn">to_excel</span>(<span class="str">"out.xlsx"</span>, index=<span class="kw">False</span>)   <span class="cm"># salvare Excel</span></code></pre>
+  </section>
+
+  <!-- ====== EXPLORARE ====== -->
+  <section class="section" id="explorare">
+    <h2 class="sec-title">Explorare DataFrame</h2>
+    <pre><code>df.<span class="fn">head</span>()            <span class="cm"># primele 5 rânduri</span>
+df.<span class="fn">tail</span>()            <span class="cm"># ultimele 5 rânduri</span>
+df.<span class="fn">info</span>()            <span class="cm"># tipuri de date + numărul valorilor non-null</span>
+df.<span class="fn">describe</span>()        <span class="cm"># statistici descriptive — DOAR coloane NUMERICE</span>
+df.<span class="fn">shape</span>             <span class="cm"># tuplu (nr_rânduri, nr_coloane)</span>
+df.<span class="fn">columns.values</span>    <span class="cm"># lista cu numele coloanelor</span>
+df.<span class="fn">dtypes</span>            <span class="cm"># tipurile fiecărei coloane</span>
+df[<span class="str">'col'</span>].<span class="fn">value_counts</span>()  <span class="cm"># câte ori apare fiecare valoare distinctă</span></code></pre>
+
+    <div class="danger">
+      <code>df.describe()</code> ignoră coloanele <strong>non-numerice</strong>. Calculează: count, mean, std, min, 25%, 50%, 75%, max.
+    </div>
+    <div class="info">
+      <code>df.shape</code> returnează un <strong>tuplu</strong> <code>(nr_rânduri, nr_coloane)</code>. Exemplu: <code>(150, 5)</code>
+    </div>
+  </section>
+
+  <!-- ====== LOC VS ILOC ====== -->
+  <section class="section" id="loc">
+    <h2 class="sec-title">⚠️ loc vs iloc — cea mai importantă diferență</h2>
+
+    <div class="compare">
+      <div class="compare-box ok">
+        <h4>df.loc — ETICHETE</h4>
+        <ul style="font-size:13px;margin-left:16px;color:var(--text);">
+          <li>Accesează după <strong>etichete</strong> (index names)</li>
+          <li>Slicing <strong>INCLUSIV</strong> la ambele capete</li>
+          <li>Acceptă <strong>mști booleene</strong></li>
+          <li>Acceptă etichete <strong>string</strong></li>
+        </ul>
+      </div>
+      <div class="compare-box bad">
+        <h4>df.iloc — POZIȚII</h4>
+        <ul style="font-size:13px;margin-left:16px;color:var(--text);">
+          <li>Accesează după <strong>poziție întreagă</strong> (0-based)</li>
+          <li>Slicing capăt <strong>EXCLUSIV</strong></li>
+          <li><strong>NU</strong> acceptă mști booleene</li>
+          <li><strong>NU</strong> acceptă etichete string → EROARE</li>
+          <li>Acceptă <strong>indici negativi</strong> (-1 = ultimul)</li>
+        </ul>
+      </div>
+    </div>
+
+    <pre><code><span class="cm"># DataFrame cu index [1,2,3,4,5]</span>
+df.<span class="fn">loc</span>[<span class="num">3</span>]      <span class="cm"># rândul cu ETICHETA 3 (al treilea rând dacă index=1,2,3,4,5)</span>
+df.<span class="fn">iloc</span>[<span class="num">3</span>]     <span class="cm"># rândul de pe POZIȚIA 3 (al PATRULEA rând, 0-indexed)</span>
+<span class="cm"># ⚠️ Cele două POT FI DIFERITE dacă indexul nu e 0,1,2,...</span>
+
+<span class="cm"># Exemple concrete</span>
+df.<span class="fn">iloc</span>[<span class="num">1</span>:<span class="num">3</span>, <span class="num">0</span>:<span class="num">2</span>]   <span class="cm"># rânduri 1,2 (exclusiv 3) și coloane 0,1 (exclusiv 2)</span>
+df.<span class="fn">iloc</span>[:, <span class="num">0</span>:<span class="num">3</span>]    <span class="cm"># PRIMELE 3 coloane (pozițiile 0, 1, 2)</span>
+df.<span class="fn">iloc</span>[-<span class="num">1</span>]        <span class="cm"># ULTIMUL rând</span>
+
+<span class="cm"># loc cu mască booleană</span>
+df.<span class="fn">loc</span>[df[<span class="str">'Pret'</span>] > <span class="num">100</span>]              <span class="cm"># ✓ loc acceptă mști booleene</span>
+df.<span class="fn">loc</span>[(df[<span class="str">'A'</span>]>0) & (df[<span class="str">'B'</span>]>0)]   <span class="cm"># ✓ & pentru AND</span>
+df.<span class="fn">loc</span>[(df[<span class="str">'A'</span>]>0) | (df[<span class="str">'B'</span>]>0)]   <span class="cm"># ✓ | pentru OR</span>
+
+<span class="cm"># Modificare cu loc</span>
+df.<span class="fn">loc</span>[df[<span class="str">'Pret'</span>] >= <span class="num">100</span>, <span class="str">"CategoriePret"</span>] = <span class="str">"mare"</span>
+<span class="cm"># Modifică coloana CategoriePret DOAR pentru rândurile cu Pret>=100</span></code></pre>
+
+    <div class="danger">
+      <code>df.iloc['banana']</code> → <strong>EROARE</strong> (iloc are nevoie de index INTEGER, nu string).<br>
+      <code>df.iloc[df['col']>0]</code> → <strong>EROARE</strong> (iloc nu acceptă condiții booleene, folosiți loc).
+    </div>
+
+    <div class="warn">
+      <strong>set_index cu inplace=False:</strong><br>
+      <code>data.set_index("last_name", inplace=False)</code> — returnează un DataFrame NOU dar <strong>nu modifică</strong> <code>data</code>. Deci <code>data.loc[['Andrade']]</code> după această linie → EROARE (indexul e tot cel implicit).
+    </div>
+
+    <h3 class="sub-title">Quiz loc vs iloc (din examene)</h3>
+    <table>
+      <tr><th>Index DataFrame</th><th>Acces</th><th>Rezultat</th></tr>
+      <tr><td>[1,2,3,4,5]</td><td><code>df.loc[3]</code></td><td>Rândul cu eticheta 3</td></tr>
+      <tr><td>[1,2,3,4,5]</td><td><code>df.iloc[3]</code></td><td>Al 4-lea rând (poziția 3, 0-indexed)</td></tr>
+      <tr><td>['a','b','c']</td><td><code>df.loc['b']</code></td><td>Rândul cu eticheta 'b'</td></tr>
+      <tr><td>['a','b','c']</td><td><code>df.iloc[1]</code></td><td>Al doilea rând (poziția 1)</td></tr>
+      <tr><td>['apple','banana']</td><td><code>df.iloc['banana']</code></td><td>❌ EROARE</td></tr>
+      <tr><td>[1,2,2,3]</td><td><code>df.loc[2]</code></td><td>TOATE rândurile cu eticheta 2</td></tr>
+    </table>
+  </section>
+
+  <!-- ====== FILTRARE ====== -->
+  <section class="section" id="filtrare">
+    <h2 class="sec-title">Filtrare</h2>
+    <pre><code><span class="cm"># Filtrare simplă</span>
+df[df[<span class="str">'Calories'</span>] > <span class="num">300</span>]
+df[df[<span class="str">'Gender'</span>] == <span class="str">'F'</span>]
+
+<span class="cm"># Condiții multiple (PARANTEZE obligatorii!)</span>
+df.<span class="fn">loc</span>[(df[<span class="str">'A'</span>]>0) & (df[<span class="str">'B'</span>]>0)]   <span class="cm"># AND</span>
+df.<span class="fn">loc</span>[(df[<span class="str">'A'</span>]>0) | (df[<span class="str">'B'</span>]>0)]   <span class="cm"># OR</span>
+
+<span class="cm"># Creare coloană condiționată</span>
+df[<span class="str">"CategoriePret"</span>] = <span class="str">"mic"</span>                              <span class="cm"># inițializare</span>
+df.<span class="fn">loc</span>[df[<span class="str">"Pret"</span>] >= <span class="num">100</span>, <span class="str">"CategoriePret"</span>] = <span class="str">"mare"</span>    <span class="cm"># modificare selectivă</span></code></pre>
+  </section>
+
+  <!-- ====== VALORI LIPSA ====== -->
+  <section class="section" id="missing">
+    <h2 class="sec-title">Valori Lipsă (NaN)</h2>
+    <pre><code><span class="cm"># Identificare</span>
+df.<span class="fn">isnull</span>().<span class="fn">sum</span>()          <span class="cm"># câte NaN pe fiecare coloană</span>
+
+<span class="cm"># Completare (fillna)</span>
+df[<span class="str">'Pret'</span>].<span class="fn">fillna</span>(df[<span class="str">'Pret'</span>].<span class="fn">mean</span>())       <span class="cm"># cu media</span>
+df[<span class="str">'Pret'</span>] = df[<span class="str">'Pret'</span>].<span class="fn">fillna</span>(df[<span class="str">'Pret'</span>].<span class="fn">mean</span>())  <span class="cm"># salvare modificare</span>
+df.<span class="fn">fillna</span>(df.<span class="fn">mean</span>())        <span class="cm"># completare cu media pe toate coloanele numerice</span>
+df.<span class="fn">fillna</span>(method=<span class="str">'ffill'</span>)   <span class="cm"># forward fill (propagă valoarea anterioară)</span>
+df.<span class="fn">fillna</span>(method=<span class="str">'bfill'</span>)   <span class="cm"># backward fill</span>
+
+<span class="cm"># Eliminare</span>
+df.<span class="fn">dropna</span>()             <span class="cm"># elimină rândurile cu orice NaN</span>
+df.<span class="fn">dropna</span>(subset=[<span class="str">'A'</span>]) <span class="cm"># elimină rândurile cu NaN în coloana A</span>
+
+<span class="cm"># Interpolate</span>
+df.<span class="fn">interpolate</span>()        <span class="cm"># interpolare liniară</span>
+
+<span class="cm"># lambda apply pentru valori lipsă condiționate</span>
+df[<span class="str">'Gender'</span>] = df.<span class="fn">apply</span>(
+    <span class="kw">lambda</span> row: <span class="str">'Female'</span> <span class="kw">if</span> row[<span class="str">'Name'</span>]==<span class="str">'Alice'</span> <span class="kw">and</span> pd.<span class="fn">isnull</span>(row[<span class="str">'Gender'</span>])
+               <span class="kw">else</span> row[<span class="str">'Gender'</span>], axis=<span class="num">1</span>)
+<span class="cm"># Completează Gender cu 'Female' DOAR dacă Name='Alice' ȘI Gender e NaN</span></code></pre>
+  </section>
+
+  <!-- ====== GROUPBY ====== -->
+  <section class="section" id="groupby">
+    <h2 class="sec-title">GroupBy</h2>
+    <pre><code><span class="cm"># Aggregare pe un nivel</span>
+df.<span class="fn">groupby</span>(<span class="str">'Duration'</span>)[<span class="str">'Calories'</span>].<span class="fn">mean</span>()
+df.<span class="fn">groupby</span>(<span class="str">'Gen'</span>)[<span class="str">'Nota'</span>].<span class="fn">count</span>()
+df.<span class="fn">groupby</span>(<span class="str">'Regiune'</span>).<span class="fn">size</span>()    <span class="cm"># numărul de rânduri per grup</span>
+
+<span class="cm"># Groupby pe mai multe coloane — returnează combinații</span>
+df.<span class="fn">groupby</span>([<span class="str">"Regiune"</span>, <span class="str">"Categorie"</span>])[<span class="str">"IDComanda"</span>].<span class="fn">count</span>()
+<span class="cm"># → numărul de comenzi pentru fiecare combinație (Regiune, Categorie)</span>
+
+<span class="cm"># Aggregare multiplă</span>
+df.<span class="fn">groupby</span>(<span class="str">'col'</span>).<span class="fn">agg</span>({<span class="str">'val'</span>: [<span class="str">'sum'</span>, <span class="str">'mean'</span>, <span class="str">'count'</span>]})</code></pre>
+  </section>
+
+  <!-- ====== MERGE CONCAT ====== -->
+  <section class="section" id="merge">
+    <h2 class="sec-title">Merge / Concat</h2>
+    <pre><code><span class="cm"># MERGE — joncțiune (implicit INNER)</span>
+pd.<span class="fn">merge</span>(df1, df2, on=<span class="str">'Date'</span>)                  <span class="cm"># INNER — doar valorile comune</span>
+df1.<span class="fn">merge</span>(df2, on=<span class="str">'Date'</span>, how=<span class="str">'left'</span>)           <span class="cm"># LEFT — toate din stânga + NaN</span>
+pd.<span class="fn">merge</span>(df1, df2, on=<span class="str">'ID'</span>, how=<span class="str">'right'</span>)       <span class="cm"># RIGHT</span>
+pd.<span class="fn">merge</span>(df1, df2, on=<span class="str">'ID'</span>, how=<span class="str">'outer'</span>)       <span class="cm"># OUTER — reuniunea</span>
+
+<span class="cm"># Indicator — coloana _merge</span>
+pd.<span class="fn">merge</span>(df1, df2, how=<span class="str">'outer'</span>, indicator=<span class="kw">True</span>)
+<span class="cm"># Coloana _merge are valorile: 'left_only', 'right_only', 'both'</span>
+
+<span class="cm"># Coloane cu același nume → sufixe _x (stânga), _y (dreapta)</span>
+
+<span class="cm"># CONCAT — concatenare VERTICALĂ (unul sub altul)</span>
+pd.<span class="fn">concat</span>([df1, df2])          <span class="cm"># concatenare verticală</span>
+pd.<span class="fn">concat</span>([df1, df2], axis=<span class="num">1</span>)  <span class="cm"># concatenare orizontală</span></code></pre>
+
+    <div class="warn">
+      <strong>merge implicit = INNER</strong> — păstrează doar rândurile cu valori comune.<br>
+      <strong>concat = verticală</strong> (unul sub altul), nu joncțiune.
+    </div>
+
+    <h3 class="sub-title">Indicator merge — Left join + IS NULL (corespondent fără plăți)</h3>
+    <pre><code><span class="cm"># Abonați FĂRĂ nicio plată (echivalent SQL left join + where null)</span>
+merged = pd.<span class="fn">merge</span>(abonati, plati, on=<span class="str">'CodAbonat'</span>, how=<span class="str">'left'</span>, indicator=<span class="kw">True</span>)
+fara_plati = merged[merged[<span class="str">'_merge'</span>] == <span class="str">'left_only'</span>]</code></pre>
+  </section>
+
+  <!-- ====== APPLY MAP ====== -->
+  <section class="section" id="apply">
+    <h2 class="sec-title">Apply / Map / Drop</h2>
+    <pre><code><span class="cm"># apply — aplică funcție pe coloană sau rând</span>
+df[<span class="str">'col'</span>].<span class="fn">apply</span>(<span class="kw">lambda</span> x: x * <span class="num">0.9</span>)   <span class="cm"># pe coloană (scalar)</span>
+df.<span class="fn">apply</span>(func, axis=<span class="num">1</span>)               <span class="cm"># pe fiecare rând (axis=1)</span>
+
+<span class="cm"># map — recodificare Series</span>
+df[<span class="str">'col'</span>].<span class="fn">map</span>(<span class="kw">lambda</span> x: <span class="str">'High'</span> <span class="kw">if</span> x > <span class="num">400</span> <span class="kw">else</span> <span class="str">'Low'</span>)
+
+<span class="cm"># drop — ștergere coloane sau rânduri</span>
+df.<span class="fn">drop</span>([<span class="str">'col1'</span>, <span class="str">'col2'</span>], axis=<span class="num">1</span>)            <span class="cm"># axis=1 = COLOANE</span>
+df.<span class="fn">drop</span>([<span class="str">'col1'</span>, <span class="str">'col2'</span>], axis=<span class="num">1</span>, inplace=<span class="kw">True</span>)  <span class="cm"># modificare in-place</span>
+df.<span class="fn">drop</span>([<span class="num">0</span>, <span class="num">1</span>], axis=<span class="num">0</span>)                       <span class="cm"># axis=0 = RÂNDURI</span>
+
+<span class="cm"># rank — atribuire ranguri</span>
+df[<span class="str">'Nota'</span>].<span class="fn">rank</span>(ascending=<span class="kw">False</span>)  <span class="cm"># egalitati -> medie (ex 4.5)</span></code></pre>
+    <div class="info">
+      <code>axis=1</code> = coloane | <code>axis=0</code> = rânduri. La <code>drop</code>, axis=1 înseamnă că ștergem <strong>coloane</strong>.
+    </div>
+  </section>
+
+  <!-- ====== DATE ====== -->
+  <section class="section" id="date">
+    <h2 class="sec-title">Date și timp</h2>
+    <pre><code><span class="cm"># Conversie la datetime</span>
+df[<span class="str">"DataComanda"</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="str">"DataComanda"</span>], dayfirst=<span class="kw">True</span>)
+<span class="cm"># dayfirst=True pt format zi/lună/an (ex: 15/03/2024)</span>
+
+df[<span class="str">"DataComanda"</span>] = pd.<span class="fn">to_datetime</span>(df[<span class="str">"DataComanda"</span>], format=<span class="str">'mixed'</span>)
+<span class="cm"># format='mixed' pt formate diferite în aceeași coloană</span>
+
+<span class="cm"># Extragere componente</span>
+df[<span class="str">"Luna"</span>] = df[<span class="str">"DataComanda"</span>].dt.<span class="fn">month</span>    <span class="cm"># luna (1-12)</span>
+df[<span class="str">"An"</span>] = df[<span class="str">"DataComanda"</span>].dt.<span class="fn">year</span>      <span class="cm"># anul</span>
+df[<span class="str">"Zi"</span>] = df[<span class="str">"DataComanda"</span>].dt.<span class="fn">day</span>       <span class="cm"># ziua</span></code></pre>
+  </section>
+
+  <!-- ====== BINNING ====== -->
+  <section class="section" id="binning">
+    <h2 class="sec-title">Binning cu pd.cut</h2>
+    <pre><code><span class="cm"># pd.cut — împărțire în intervale (binning)</span>
+df[<span class="str">'Grupa'</span>] = pd.<span class="fn">cut</span>(df[<span class="str">'Varsta'</span>],
+                    bins=[<span class="num">0</span>, <span class="num">18</span>, <span class="num">35</span>, <span class="num">60</span>, <span class="num">100</span>],
+                    labels=[<span class="str">'Minor'</span>, <span class="str">'Tanar'</span>, <span class="str">'Adult'</span>, <span class="str">'Senior'</span>])
+
+<span class="cm"># pd.cut împarte coloana numerică în INTERVALE — ca PROC FORMAT în SAS</span></code></pre>
+    <div class="info">
+      <code>pd.cut</code> = împarte o coloană numerică în <strong>intervale</strong>. <code>pd.qcut</code> = intervale cu frecvențe egale.
+    </div>
+  </section>
+
+  <!-- ====== DROP SET INDEX ====== -->
+  <section class="section" id="drop">
+    <h2 class="sec-title">Drop / Set Index / Sort</h2>
+    <pre><code><span class="cm"># Sortare</span>
+df.<span class="fn">sort_values</span>(<span class="str">'col'</span>)
+df.<span class="fn">sort_values</span>([<span class="str">'a'</span>, <span class="str">'b'</span>], ascending=[<span class="kw">True</span>, <span class="kw">False</span>])
+
+<span class="cm"># set_index</span>
+df.<span class="fn">set_index</span>(<span class="str">"coloana"</span>)               <span class="cm"># returnează NOU — original NESCHIMBAT</span>
+df2 = df.<span class="fn">set_index</span>(<span class="str">"coloana"</span>)         <span class="cm"># salvare corectă</span>
+df.<span class="fn">set_index</span>(<span class="str">"coloana"</span>, inplace=<span class="kw">True</span>)  <span class="cm"># modificare in-place</span>
+
+<span class="cm"># reset_index</span>
+df.<span class="fn">reset_index</span>(inplace=<span class="kw">True</span>)         <span class="cm"># resetează indexul la 0,1,2,...</span></code></pre>
+  </section>
+
+  <!-- ====== TRAPS ====== -->
+  <section class="section" id="traps">
+    <h2 class="sec-title">⚠️ Capcane frecvente la examen</h2>
+    <div class="card" style="border-color:var(--red);">
+      <table>
+        <tr><th>Situație</th><th>Corect / Greșit</th></tr>
+        <tr><td><code>df.iloc['banana']</code></td><td>❌ EROARE — iloc nu acceptă string</td></tr>
+        <tr><td><code>df.iloc[df['col']>0]</code></td><td>❌ EROARE — iloc nu acceptă mști booleene</td></tr>
+        <tr><td><code>df.loc[(c1)&(c2)]</code></td><td>✓ Corect — loc acceptă mști</td></tr>
+        <tr><td><code>df.describe()</code></td><td>Ignoră coloanele <strong>non-numerice</strong></td></tr>
+        <tr><td><code>df.set_index(inplace=False)</code></td><td>Original NESCHIMBAT</td></tr>
+        <tr><td><code>pd.merge()</code> implicit</td><td>INNER join (doar comune)</td></tr>
+        <tr><td><code>pd.concat()</code></td><td>Concatenare VERTICALĂ, nu join</td></tr>
+        <tr><td>Coloane cu același nume la merge</td><td>Sufixe _x (stânga) și _y (dreapta)</td></tr>
+        <tr><td><code>indicator=True</code> la merge</td><td>Coloana <code>_merge</code>: left_only / right_only / both</td></tr>
+        <tr><td><code>df.iloc[1:3, 0:2]</code></td><td>Rânduri 1,2 și coloane 0,1 (capăt EXCLUSIV)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">Preprocesare — Ordinea pipeline</h3>
+      <ol style="margin-left:20px;line-height:2;">
+        <li>Valori lipsă (fillna / dropna / interpolate)</li>
+        <li>Codificare non-numeric (Label Encoding, One-Hot, Target)</li>
+        <li>Outlieri (IQR = Q3-Q1; limite: Q1-1.5*IQR / Q3+1.5*IQR)</li>
+        <li>Scalare (StandardScaler, MinMaxScaler, RobustScaler)</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 class="sub-title">RobustScaler — Rezistent la Outlieri</h3>
+      <pre><code><span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> RobustScaler
+scaler = <span class="fn">RobustScaler</span>(quantile_range=(<span class="num">25</span>, <span class="num">75</span>))
+df_r = scaler.<span class="fn">fit_transform</span>(df)
+<span class="cm"># Scalează mai puțin sensibil la outlieri (folosește IQR, nu std)</span></code></pre>
+    </div>
+  </section>
+</main>
+
+<script>
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('#nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>

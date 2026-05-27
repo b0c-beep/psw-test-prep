@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grile Extrase — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:20px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ctrl-btn.primary:hover{background:#4f46e5;}
+#stats{display:flex;gap:16px;align-items:center;font-size:13px;color:var(--text-muted);}
+#stats span{background:var(--surface2);padding:4px 10px;border-radius:20px;}
+#stats .sc{color:var(--green);}
+#stats .ic{color:var(--red);}
+#container{max-width:820px;margin:0 auto;padding:32px 24px;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;transition:border-color .2s;}
+.q-card.answered{border-color:var(--border);}
+.q-meta{display:flex;gap:8px;margin-bottom:12px;align-items:center;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-python{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3);}
+.cat-pandas{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3);}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.cat-teorie{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:15px;font-weight:500;margin-bottom:16px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre.q-code{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:12px 16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);margin:10px 0 14px;}
+.options{display:flex;flex-direction:column;gap:8px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.selected{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:26px;height:26px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt-text{font-size:14px;line-height:1.5;}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:8px;font-size:13px;display:none;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#6ee7b7;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn:hover{border-color:var(--accent);}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.hidden{display:none;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:28px;font-weight:700;color:var(--accent-light);}
+#score-box p{color:var(--text-muted);margin-top:6px;}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>Grile Extrase — PSW</h1>
+  <div id="stats">
+    <span id="total-count">0 grile</span>
+    <span class="sc" id="correct-count">✓ 0</span>
+    <span class="ic" id="wrong-count">✗ 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleQuestions()">🔀 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">↺ Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">👁 Arată Răspunsuri</button>
+</div>
+
+<div id="container">
+  <div id="score-box">
+    <h2 id="score-text">0 / 0</h2>
+    <p id="score-pct"></p>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all', this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('python', this)">Python</button>
+    <button class="filter-btn" onclick="filterCat('pandas', this)">Pandas</button>
+    <button class="filter-btn" onclick="filterCat('streamlit', this)">Streamlit</button>
+    <button class="filter-btn" onclick="filterCat('sas', this)">SAS</button>
+    <button class="filter-btn" onclick="filterCat('teorie', this)">Teorie</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+
+<script>
+const questions = [
+  // ====== PYTHON ======
+  {cat:"python",text:"Ce afișează codul următor?<pre class='q-code'>note=[7,9,6,10]\nrezultat=sorted(note)\nprint(note[0], rezultat[0])</pre>",opts:["a) 6 6","b) 7 6","c) 7 7","d) 6 7"],correct:1,explanation:"sorted() returnează o NOUĂ listă sortată. note rămâne [7,9,6,10], deci note[0]=7. rezultat=[6,7,9,10], deci rezultat[0]=6."},
+  {cat:"python",text:"Ce se întâmplă la execuția codului următor?<pre class='q-code'>sampleList = ['Jon', 'Kelly', 'Jessa']\nsampleList.append(2, 'Scott')\nprint(sampleList)</pre>",opts:["a) ['Jon','Kelly','Jessa',2,'Scott']","b) ['Jon','Kelly','Jessa',2]","c) ERROR","d) ['Jon','Kelly','Jessa','Scott']"],correct:2,explanation:"list.append() acceptă UN SINGUR argument. Apelul cu 2 argumente generează TypeError."},
+  {cat:"python",text:"Ce afișează codul următor?<pre class='q-code'>for x in range(0.5, 5.5, 0.5):\n    print(x)</pre>",opts:["a) 0.5, 1.0, 1.5 ...","b) 1 valoare","c) ERROR","d) Nimic"],correct:2,explanation:"range() acceptă DOAR argumente întregi (int). range(0.5, 5.5, 0.5) → TypeError."},
+  {cat:"python",text:"Ce afișează codul următor?<pre class='q-code'>t = (1,2,4,3,8,9)\nprint([t[i] for i in range(0, len(t), 2)])</pre>",opts:["a) [2,3,9]","b) [1,2,4]","c) [1,4,8]","d) [2,4,6]"],correct:2,explanation:"range(0, 6, 2) produce indicii 0, 2, 4. t[0]=1, t[2]=4, t[4]=8. Rezultat: [1,4,8]."},
+  {cat:"python",text:"Ce se întâmplă dacă executați?<pre class='q-code'>a = (1, 2, 3, 4)\ndel a</pre>",opts:["a) TypeError — tuplul nu poate fi șters","b) Șterge al 4-lea element","c) Da, întregul tuplu (variabila) este șters","d) Șterge ultimul element"],correct:2,explanation:"del a șterge VARIABILA a (nu un element). Tuplul este imutabil (nu poți șterge elemente), dar variabila poate fi ștearsă."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>a = [1,2,3,None,(),[]]  \nprint(len(a))</pre>",opts:["a) 3","b) 4","c) 5","d) 6"],correct:3,explanation:"len() numără toate elementele, inclusiv None, () și []. Lista are 6 elemente."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>names = ['Amir','Barry','Charles','Dao']\nprint(names[-1][-1])</pre>",opts:["a) 'D'","b) 'y'","c) 'o'","d) 'Dao'"],correct:2,explanation:"names[-1] = 'Dao' (ultimul element). 'Dao'[-1] = 'o' (ultimul caracter)."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>salary = 8000\ndef printSalary():\n    salary = 12000\n    print(salary)\nprintSalary()\nprint(salary)</pre>",opts:["a) 8000, 8000","b) 12000, 8000","c) 12000, 12000","d) 8000, 12000"],correct:1,explanation:"Variabila salary din funcție este LOCALĂ. printSalary() afișează 12000 (locală). print(salary) de după afișează 8000 (globală, neschimbată)."},
+  {cat:"python",text:"Ce returnează my_tuple.append(5) dacă my_tuple = (1,2,3)?",opts:["a) (1,2,3,5)","b) [1,2,3,5]","c) None","d) AttributeError — tuplul nu are append"],correct:3,explanation:"Tuplul este IMUTABIL și nu are metoda append(). Apelul generează AttributeError."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>d = {'john':40, 'peter':45}\nprint(d['john'])</pre>",opts:["a) 'peter'","b) 40","c) 45","d) ERROR"],correct:1,explanation:"Dicționarul este accesat prin CHEIE. d['john'] returnează valoarea 40."},
+  {cat:"python",text:"Ce evaluează operatorul 'in' aplicat pe:<pre class='q-code'>if 'bar' in {'foo':1,'bar':2,'baz':3}:\n    print(1)\n    print(2)\nif 'a' in 'qux':\n    print(3)\nprint(4)</pre>",opts:["a) 1, 2, 3, 4","b) 1, 4","c) 1, 2, 4","d) 4"],correct:2,explanation:"'bar' este cheie în dicționar → print(1) și print(2). 'a' nu este în 'qux' → print(3) sărit. print(4) se execută întotdeauna."},
+  {cat:"python",text:"Ce face def(a,b,c): pass ?",opts:["a) Eroare de sintaxă","b) Definește o funcție fără nume","c) Definește o funcție care nu face nimic (pass = placeholder)","d) Execută a, b, c"],correct:2,explanation:"pass este un placeholder valabil în Python. Funcția este definită corect (dacă are un nume valid) și nu face nimic."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>def calculate(num1, num2=4):\n    res = num1 * num2\n    print(res)\ncalculate(5, 6)</pre>",opts:["a) 20","b) 24","c) 30","d) Error"],correct:2,explanation:"calculate(5, 6): num1=5, num2=6 (suprascrie valoarea implicită 4). 5*6=30."},
+  {cat:"python",text:"Python este case-sensitive. Dacă names1 = ['Amir','Barry'], ce afișează if 'amir' in names1: print(1)\nelse: print(2)?",opts:["a) 1","b) 2","c) Error","d) Nimic"],correct:1,explanation:"'amir' ≠ 'Amir' (case-sensitive). 'amir' nu este în names1 → else → print(2)."},
+  {cat:"python",text:"Ce este a = [(1,1),(2,4),(3,9)]?",opts:["a) Un tuple de liste","b) Un dicționar","c) O listă de tupluri","d) Un set"],correct:2,explanation:"Sintaxa [] cu elemente () → este o LISTĂ de TUPLURI."},
+  {cat:"python",text:"Ce afișează?<pre class='q-code'>x = 0\nwhile x < 100:\n    x += 2\nprint(x)</pre>",opts:["a) 98","b) 99","c) 100","d) 102"],correct:2,explanation:"x crește cu 2 de fiecare dată (0,2,4,...,98,100). Când x=100, condiția x<100 devine False și bucla se oprește. print(x) = 100."},
+
+  // ====== PANDAS ======
+  {cat:"pandas",text:"Ce returnează df.describe()?",opts:["a) Statistici pentru TOATE coloanele","b) Statistici descriptive DOAR pentru coloanele numerice","c) Tipurile coloanelor și valorile non-null","d) Primele 5 rânduri"],correct:1,explanation:"df.describe() calculează statistici (count, mean, std, min, max, percentile) DOAR pentru coloanele numerice. df.info() arată tipurile."},
+  {cat:"pandas",text:"Ce returnează df.shape?",opts:["a) Numărul de coloane","b) Numărul de rânduri","c) Un tuplu (nr_rânduri, nr_coloane)","d) O listă cu dimensiunile"],correct:2,explanation:"df.shape returnează un TUPLU (nr_rânduri, nr_coloane). Exemplu: (150, 5) = 150 rânduri, 5 coloane."},
+  {cat:"pandas",text:"Ce generează eroare?<pre class='q-code'>df.iloc['banana']</pre>",opts:["a) Nimic — funcționează normal","b) KeyError","c) ValueError","d) Eroare — iloc are nevoie de index INTEGER, nu string"],correct:3,explanation:"iloc accesează după POZIȚIE ÎNTREAGĂ. Pasarea unui string ('banana') generează eroare. Folosiți df.loc['banana'] pentru acces prin etichetă."},
+  {cat:"pandas",text:"Ce returnează df.iloc[1:3, 0:2]?",opts:["a) Rândurile 1,2 și coloanele 0,1","b) Rândurile 1,2,3 și coloanele 0,1,2","c) Rândul 1 și coloana 2","d) Rândul 3 și coloana 2"],correct:0,explanation:"iloc are capătul din dreapta EXCLUSIV. 1:3 → pozițiile 1,2. 0:2 → pozițiile 0,1. Rezultat: 2 rânduri și 2 coloane."},
+  {cat:"pandas",text:"Ce face data.set_index('last_name', inplace=False)?",opts:["a) Modifică data cu indexul last_name","b) Returnează un nou DataFrame — data NU este modificat","c) Șterge coloana last_name","d) Adaugă o coloană nouă"],correct:1,explanation:"inplace=False (implicit) returnează un DataFrame NOU fără să modifice originalul. Dacă accesați data.loc['Andrade'] după, va da eroare (indexul e tot cel implicit)."},
+  {cat:"pandas",text:"Efectul indicator=True la pd.merge():",opts:["a) Adaugă ID la fiecare rând","b) Arată doar rândurile comune","c) Adaugă coloana _merge cu: left_only / right_only / both","d) Schimbă tipul join-ului"],correct:2,explanation:"indicator=True adaugă coloana _merge care indică dacă rândul provine din stânga ('left_only'), dreapta ('right_only') sau ambele ('both')."},
+  {cat:"pandas",text:"Ce face pd.merge(df1, df2, on='ID') implicit?",opts:["a) LEFT JOIN","b) OUTER JOIN","c) INNER JOIN (doar valorile comune)","d) FULL JOIN"],correct:2,explanation:"Implicit, pd.merge() realizează un INNER JOIN — păstrează doar rândurile cu valori comune în coloana specificată la on=."},
+  {cat:"pandas",text:"Diferența dintre pd.merge() și pd.concat():",opts:["a) Nu există diferență","b) merge = join pe coloane comune; concat = concatenare verticală (unul sub altul)","c) concat = join; merge = concatenare","d) merge funcționează doar cu CSV"],correct:1,explanation:"pd.merge() realizează JOIN pe o coloană comună. pd.concat() concatenează VERTICAL (unul sub altul), fără join pe chei."},
+  {cat:"pandas",text:"Ce face df.drop(['col1','col2'], axis=1)?",opts:["a) Șterge rândurile 1 și 2","b) Șterge coloanele col1 și col2","c) Redenumește coloanele","d) Sortează coloanele"],correct:1,explanation:"axis=1 = coloane. drop() cu axis=1 șterge COLOANE. axis=0 ar șterge rânduri."},
+  {cat:"pandas",text:"Ce face df['Pret'].fillna(df['Pret'].mean())?",opts:["a) Șterge rândurile cu NaN","b) Completează valorile NaN cu MEDIA coloanei Pret","c) Înlocuiește media cu NaN","d) Calculează media ignorând NaN"],correct:1,explanation:"fillna() completează (înlocuiește) valorile lipsă (NaN) cu valoarea specificată — în acest caz cu media coloanei."},
+  {cat:"pandas",text:"Ce returnează df.groupby(['Regiune','Categorie'])['IDComanda'].count()?",opts:["a) Numărul total de comenzi","b) Media comenzilor pe regiune","c) Numărul de comenzi pentru fiecare COMBINAȚIE de regiune și categorie","d) Lista comenzilor"],correct:2,explanation:"groupby pe două coloane → rezultatele sunt grupate pe fiecare COMBINAȚIE (Regiune, Categorie). count() numără înregistrările per grup."},
+  {cat:"pandas",text:"df = pd.read_csv('f.csv'); df['DataComanda'] = pd.to_datetime(df['DataComanda'], dayfirst=True); df['Luna'] = df['DataComanda'].dt.month. Ce face?",opts:["a) Eroare — dayfirst nu există","b) Convertește data (format zi/lun/an) și extrage luna","c) Sortează după dată","d) Formatează data ca string"],correct:1,explanation:"dayfirst=True indică format zi/lun/an (ex: 15/03/2024). .dt.month extrage componenta LUNA (1-12) din coloana datetime."},
+  {cat:"pandas",text:"Ce face df.loc[df['VENIT_ANUAL_RON']>10000, 'PRESCORING']=7?",opts:["a) Filtrează rândurile cu venit > 10000","b) Adaugă o coloană nouă","c) Modifică coloana PRESCORING cu 7 pentru rândurile cu venit > 10000","d) Calculează media"],correct:2,explanation:"df.loc[condiție, 'coloana'] = valoare modifică valorile din coloana specificată DOAR pentru rândurile care satisfac condiția."},
+  {cat:"pandas",text:"Ce rol are pd.cut?",opts:["a) Taie rânduri din DataFrame","b) Împarte o coloană numerică în INTERVALE (binning)","c) Calculează cuantile","d) Elimină valorile extreme"],correct:1,explanation:"pd.cut împarte valorile unei coloane numerice în INTERVALE specificate (similar cu PROC FORMAT în SAS). Utilă pentru codificarea variabilelor continue."},
+  {cat:"pandas",text:"Ce face value_counts()?",opts:["a) Calculează suma valorilor","b) Sortează valorile","c) Numără valorile unice","d) Arată valorile lipsă"],correct:2,explanation:"value_counts() numără câte ori apare fiecare valoare distinctă dintr-o coloană — returnează Series sortat descrescător."},
+
+  // ====== STREAMLIT ======
+  {cat:"streamlit",text:"Cum pornești o aplicație Streamlit numită app.py?",opts:["a) python app.py","b) streamlit run app.py","c) streamlit start app.py","d) run app.py"],correct:1,explanation:"Comanda corectă este 'streamlit run app.py'. Aplicația pornește pe http://localhost:8501."},
+  {cat:"streamlit",text:"Ce se întâmplă la ORICE interacțiune a utilizatorului (click buton, mișcare slider)?",opts:["a) Se execută doar blocul if din buton","b) Scriptul se execută de la jumătate","c) Întreg scriptul Python se RE-EXECUTĂ de sus în jos","d) Aplicația se reîncarcă din browser"],correct:2,explanation:"Modelul Streamlit este TOP-DOWN: la orice interacțiune, ÎNTREG scriptul se reexecută de la început. Variabilele simple se pierd — folosiți session_state."},
+  {cat:"streamlit",text:"Ce face st.slider('Level:', 1, 10, 5)?",opts:["a) Creează un slider cu valorile 1-10 și valoarea implicită 5","b) Setează culoarea paginii","c) Adaugă 5 la un slider existent","d) Este un element de layout"],correct:0,explanation:"st.slider(label, min, max, default) creează un slider widget de input. Returnează valoarea selectată. Este un widget de INPUT, nu layout."},
+  {cat:"streamlit",text:"Ce returnează st.multiselect('Alege:', ['A','B','C']) când nu e nimic selectat?",opts:["a) None","b) False","c) O listă goală []","d) 'A' (prima opțiune)"],correct:2,explanation:"st.multiselect() returnează o LISTĂ GOALĂ [] când nu este nimic selectat, nu None."},
+  {cat:"streamlit",text:"Ce face st.session_state?",opts:["a) Resetează starea aplicației","b) Salvează datele în baza de date","c) Un dicționar ce păstrează valori ÎNTRE re-execuțiile scriptului","d) Stochează configurația paginii"],correct:2,explanation:"session_state este un dicționar persistent între re-execuțiile scriptului. Variabilele simple se pierd la fiecare re-execuție, dar session_state păstrează valorile."},
+  {cat:"streamlit",text:"Care afirmație despre session_state este FALSĂ?",opts:["a) Este un dicționar ce păstrează valori între reexecutări","b) Poate memora numărul de click-uri","c) Se GOLEȘTE AUTOMAT la fiecare apăsare de buton","d) Poate reține obiecte precum DataFrame"],correct:2,explanation:"FALS: session_state NU se golește automat la apăsarea butonului. Persistă până la închiderea sesiunii sau ștergerea explicită."},
+  {cat:"streamlit",text:"Care dintre acestea sunt widget-uri de SELECȚIE?",opts:["a) st.write, st.table, st.dataframe","b) st.title, st.header, st.markdown","c) st.selectbox, st.multiselect, st.checkbox","d) st.columns, st.sidebar, st.expander"],correct:2,explanation:"Widget-urile de selecție sunt: selectbox (o opțiune), multiselect (mai multe), radio, checkbox. st.code este afișare, nu selecție."},
+  {cat:"streamlit",text:"Care afișează un tabel INTERACTIV (cu scroll și sortare)?",opts:["a) st.table(df)","b) st.dataframe(df)","c) st.write_table(df)","d) st.json(df)"],correct:1,explanation:"st.dataframe() = INTERACTIV (scroll, sortare). st.table() = STATIC. st.data_editor() = editabil."},
+  {cat:"streamlit",text:"Care sunt elemente de LAYOUT în Streamlit?",opts:["a) st.button, st.text_input, st.slider","b) st.title, st.header, st.write","c) st.sidebar, st.columns, st.expander","d) st.success, st.error, st.warning"],correct:2,explanation:"Elementele de LAYOUT sunt: sidebar, columns, expander, tabs. st.slider este widget de INPUT, nu layout!"},
+  {cat:"streamlit",text:"Cum creezi două coloane egale în Streamlit?",opts:["a) st.column(2)","b) st.layout('2col')","c) left, right = st.split(2)","d) col1, col2 = st.columns(2)"],correct:3,explanation:"col1, col2 = st.columns(2) creează două coloane egale. Utilizați 'with col1: ...' pentru a adăuga conținut."},
+  {cat:"streamlit",text:"Ce face st.sidebar.radio('Navigare:', ['Home','Settings'])?",opts:["a) Afișează un radio button în corpul principal","b) Creează un meniu de navigare în bara LATERALĂ","c) Setează pagina curentă","d) Adaugă butoane de radio în header"],correct:1,explanation:"st.sidebar.<widget> plasează widget-ul în bara laterală (sidebar). Util pentru navigare."},
+
+  // ====== SAS ======
+  {cat:"sas",text:"Care este rolul instrucțiunii SET în SAS?",opts:["a) Definește variabilele","b) Concatenează seturi de date","c) Filtrează observațiile","d) Sortează datele"],correct:1,explanation:"SET citește și concatenează seturi de date. 'data total; set t1 t2; run;' = concatenare (rândurile lui t2 după t1)."},
+  {cat:"sas",text:"Care este diferența dintre SET și MERGE în SAS?",opts:["a) Nu există diferență","b) SET = concatenare verticală; MERGE+BY = fuziune (join) pe o variabilă","c) MERGE = concatenare; SET = join","d) SET = filtrare; MERGE = sortare"],correct:1,explanation:"SET concatenează seturi (unul după altul). MERGE+BY realizează fuziunea (join) pe baza valorilor din variabila BY."},
+  {cat:"sas",text:"Ce reprezintă LIBNAME în SAS?",opts:["a) Numele unui fișier de date","b) Biblioteca (directorul) unde sunt stocate seturile de date","c) Un format de afișare","d) Un tip de variabilă"],correct:1,explanation:"LIBNAME declară o bibliotecă = un DIRECTOR în sistemul de fișiere. Permite referirea seturilor cu notația biblio.set."},
+  {cat:"sas",text:"Ce generează eroare?<pre class='q-code'>libname date '/home/user/produse.txt';</pre>",opts:["a) Nimic — funcționează corect","b) EROARE: LIBNAME trebuie să refere un DIRECTOR, nu un fișier","c) Avertizare — se poate folosi","d) Funcționează pe Windows"],correct:1,explanation:"LIBNAME trebuie să refere un DIRECTOR. Dacă referă un fișier (.txt), SAS generează eroare. INFILE se folosește pentru fișiere."},
+  {cat:"sas",text:"Fișierele temporare SAS se caracterizează prin:",opts:["a) Sunt stocate pe disc permanent","b) Au extensia .sas7bdat și sunt în biblioteca WORK","c) Nume pe UN SINGUR NIVEL (ex: 'temp'), din biblioteca WORK, șterse la închiderea sesiunii","d) Sunt stocate în memorie RAM"],correct:2,explanation:"Fișierele temporare sunt în biblioteca WORK (implicit), au un singur nivel în nume (ex: 'studenti' nu 'lib.studenti') și sunt șterse la terminarea sesiunii SAS."},
+  {cat:"sas",text:"Ce face 'Total + Venit;' (fără semnul =) într-un DATA step?",opts:["a) Calculează o valoare nouă care se resetează la fiecare rând","b) Calculează o SUMĂ CUMULATĂ, reținând valoarea de la o observație la alta","c) Adaugă constanta la Total","d) Eroare de sintaxă"],correct:1,explanation:"Instrucțiunea sum (var + expresie; fără =) = ACUMULATOR. Se inițializează cu 0, ignoră valorile lipsă și reține valoarea între observații."},
+  {cat:"sas",text:"Care este diferența dintre WHERE și IF în SAS?",opts:["a) Nu există diferență","b) WHERE e valid în PROC; IF (subset) NU e valid în PROC","c) IF e valid în PROC; WHERE nu","d) Ambele sunt valide în PROC"],correct:1,explanation:"WHERE este valid atât în DATA step cât și în secțiunile PROC. IF (subset fără THEN) funcționează DOAR în DATA step, nu în PROC."},
+  {cat:"sas",text:"Ce returnează funcția PUT în SAS?",opts:["a) O valoare NUMERICĂ","b) O valoare CARACTER (convertit din numeric)","c) O dată calendaristică","d) Un format de afișare"],correct:1,explanation:"PUT(valoare_numerică, format.) returnează o valoare CARACTER. Convertește numeric → caracter folosind formatul specificat."},
+  {cat:"sas",text:"Ce face PROC SORT fără BY?",opts:["a) Sortează după prima coloană","b) Sortează aleatoriu","c) EROARE — BY este OBLIGATORIU","d) Rulează fără efect"],correct:2,explanation:"PROC SORT necesită OBLIGATORIU instrucțiunea BY. Fără BY, SAS generează eroare și sortarea nu se realizează."},
+  {cat:"sas",text:"Care este efectul instrucțiunii 'title;' (fără număr)?",opts:["a) Setează titlul implicit SAS","b) Afișează numărul raportului","c) RESETEAZĂ toate titlurile anterioare","d) Adaugă un titlu gol"],correct:2,explanation:"title; (fără număr și fără text) RESETEAZĂ toate titlurile anterioare (title1, title2 etc.). Rapoartele ulterioare nu vor afișa niciun titlu."},
+  {cat:"sas",text:"Cum se scrie sortarea descrescătoare după două variabile în PROC SORT?",opts:["a) by descending Postal_Code, Employee_ID","b) by descending Postal_Code descending Employee_ID","c) by desc Postal_Code desc Employee_ID","d) by descending (Postal_Code, Employee_ID)"],correct:1,explanation:"Cuvântul cheie 'descending' se REPETĂ pentru fiecare variabilă care trebuie sortată descrescător."},
+  {cat:"sas",text:"Ce face PROC APPEND?",opts:["a) Creează un set nou din două seturi","b) Adaugă observații la un set EXISTENT fără să îl recitească","c) Concatenează cu sortare","d) Face fuziunea a două seturi"],correct:1,explanation:"PROC APPEND adaugă observațiile din data= la setul base= fără să recitească setul de bază. NU creează un set nou."},
+  {cat:"sas",text:"Ce face 'merge a(in=inA) b(in=inB); by ID; if inA and not inB;'?",opts:["a) Toate observațiile din ambele seturi","b) Doar observațiile comune (inner join)","c) Observațiile din A care NU au corespondent în B","d) Observațiile din B care NU au corespondent în A"],correct:2,explanation:"inA=1 dacă ID există în a. inB=1 dacă ID există în b. 'if inA and not inB' = rândurile din A fără corespondent în B (LEFT ANTI JOIN)."},
+  {cat:"sas",text:"Ce tip de coloane există în SAS?",opts:["a) Întreg, real, șir","b) NUMERIC și CARACTER","c) Integer, float, char, date","d) Numeric, caracter și boolean"],correct:1,explanation:"SAS are DOAR două tipuri de coloane: NUMERIC (implicit) și CARACTER (marcat cu $ în INPUT). Nu există bool, int, float separate."},
+  {cat:"sas",text:"Ce face funcția MONTH() în SAS?",opts:["a) Returnează numărul de luni între două date","b) Returnează luna ca valoare 1-12","c) Convertește luna în text","d) Adaugă o lună la o dată"],correct:1,explanation:"MONTH(data_SAS) returnează luna ca număr întreg între 1 (ianuarie) și 12 (decembrie)."},
+  {cat:"sas",text:"Care instrucțiune SAS permite citirea datelor direct din cod (în program)?",opts:["a) INFILE","b) INPUT","c) DATALINES","d) CARDS"],correct:2,explanation:"DATALINES (sau echivalentul CARDS) permite introducerea datelor direct în codul SAS, fără fișier extern."},
+  {cat:"sas",text:"Ce condiție trebuie să îndeplinească un ARRAY în SAS pentru a înlocui valorile 0 cu valoare lipsă?<pre class='q-code'>array raspunsuri{6} Q1-Q6;\ndo i=1 to 6;\n    if raspunsuri{i)=0 then raspunsuri{i}=.;\nend;</pre>",opts:["a) Incorect — tabelul trebuie să fie 2D","b) Corect — iterează Q1-Q6 și înlocuiește 0 cu . (valoare lipsă)","c) Eroare — . nu este valoare lipsă în SAS","d) Eroare — FOR trebuie folosit în loc de DO"],correct:1,explanation:"ARRAY + DO permite iterarea variabilelor Q1-Q6. Valoarea lipsă în SAS este . (punct) pentru numeric. Codul este corect."},
+  {cat:"sas",text:"Operatorul LIKE în WHERE funcționează cu sabloane. Ce înseamnă _ și %?",opts:["a) _ = oricâte caractere, % = un singur caracter","b) _ = un singur caracter, % = oricâte caractere","c) _ = cifre, % = litere","d) _ = caractere speciale, % = wildcard"],correct:1,explanation:"În WHERE LIKE: _ = exact UN caracter, % = oricâte caractere. 'A_e%' potrivește 'Acer', 'Alex', 'Aleg...' etc."},
+  {cat:"sas",text:"Ce face DO UNTIL față de DO WHILE?",opts:["a) Sunt identice","b) DO WHILE verifică condiția ANTERIOR — s-ar putea să nu se execute. DO UNTIL verifică POSTERIOR — se execută MINIM o dată","c) DO UNTIL verifică anterior, DO WHILE posterior","d) DO UNTIL nu există în SAS"],correct:1,explanation:"DO WHILE verifică condiția la ÎNCEPUT (poate nu se executa niciodată). DO UNTIL verifică la SFÂRȘIT (se execută minim o dată)."},
+
+  // ====== TEORIE ======
+  {cat:"teorie",text:"Software-ul LIBER (free software) este caracterizat de:",opts:["a) Este întotdeauna gratuit","b) Are codul sursă disponibil și 4 libertăți: utilizare/studiu/adaptare/distribuire","c) Este shareware cu perioadă de probă","d) Nu poate fi modificat"],correct:1,explanation:"Software-ul liber garantează 4 libertăți: utilizare, studiu, adaptare, distribuire. COSTUL nu este criteriu — poate fi plătit sau gratuit."},
+  {cat:"teorie",text:"Shareware este:",opts:["a) Software gratuit cu cod sursă","b) Software liber cu 4 libertăți","c) Software PROPRIETAR furnizat gratuit pentru o perioadă LIMITATĂ","d) Software fără restricții"],correct:2,explanation:"Shareware = software proprietar, furnizat gratuit pentru o perioadă limitată (trial). Open-source = cod sursă disponibil. Freeware = gratuit pentru utilizare."},
+  {cat:"teorie",text:"IaaS (Infrastructure as a Service) se referă la:",opts:["a) Aplicații software livrate prin internet","b) Platforme de dezvoltare","c) Servicii legate de dispozitivele HARDWARE","d) Sisteme de operare ca serviciu"],correct:2,explanation:"IaaS = servicii hardware (servere, stocare, rețea). PaaS = platforme de dezvoltare. SaaS = aplicații software livrate online."},
+  {cat:"teorie",text:"Unde este amplasată infrastructura unui cloud PUBLIC?",opts:["a) La sediul clientului","b) La sediul FURNIZORULUI de cloud","c) Distribuită între client și furnizor","d) Pe servere publice ale Internetului"],correct:1,explanation:"Cloud public = infrastructura se află la sediul FURNIZORULUI (ex: Amazon AWS, Microsoft Azure). Accesul se face prin internet."},
+  {cat:"teorie",text:"Utilizatorul autorizat al unui program poate analiza și studia programul fără autorizare suplimentară?",opts:["a) NU — are nevoie de permisiune scrisă","b) DA — aceasta este un drept legal al utilizatorului autorizat","c) Depinde de licență","d) Numai pentru software open-source"],correct:1,explanation:"Legea dreptului de autor permite utilizatorului autorizat să analizeze și studieze programul (drept garantat). O copie de arhivă/siguranță este de asemenea permisă."},
+  {cat:"teorie",text:"Ce NU este protejat de legea dreptului de autor pentru software?",opts:["a) Codul sursă","b) Documentația","c) Ideile, algoritmii și conceptele matematice","d) Codul obiect"],correct:2,explanation:"Dreptul de autor protejează EXPRESIA programului (cod sursă, cod obiect, documentație), NU ideile, algoritmii, metodele sau conceptele matematice din spate."},
+  {cat:"teorie",text:"Criteriile de UTILIZABILITATE la alegerea software-ului includ:",opts:["a) Prețul și licența","b) Interfața utilizator, tipuri utilizatori, vizualizarea datelor, raportarea erorilor","c) Funcționalitatea și completitudinea","d) Suportul tehnic și garanția"],correct:1,explanation:"Utilizabilitate = criterii de calitate: interfața utilizator, tipuri de utilizatori, vizualizarea datelor, raportarea erorilor, varietatea domeniului de utilizare."},
+  {cat:"teorie",text:"Tipurile de servicii cloud sunt:",opts:["a) Public, privat, hibrid","b) SaaS, PaaS, IaaS","c) Hardware, Software, Rețea","d) Intern, extern, comunitar"],correct:1,explanation:"Tipurile de servicii cloud: SaaS (aplicații), PaaS (platforme), IaaS (hardware/infrastructură). Public/privat/hibrid/comunitar sunt tipuri de amplasare."},
+];
+
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, globalIdx) => {
+    const actualIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card' + (answered[actualIdx] !== undefined ? ' answered' : '');
+    div.id = 'q-' + actualIdx;
+
+    const letters = ['a', 'b', 'c', 'd', 'e'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[actualIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[actualIdx] && answered[actualIdx] !== q.correct) cls += ' wrong';
+      }
+      const displayText = opt.startsWith(letters[i]+')') ? opt.substring(3) : opt;
+      return `<div class="${cls}" onclick="selectAnswer(${actualIdx}, ${i})">
+        <span class="opt-letter">${letters[i]}</span>
+        <span class="opt-text">${displayText}</span>
+      </div>`;
+    }).join('');
+
+    let fbHtml = '';
+    if (answered[actualIdx] !== undefined) {
+      const isCorrect = answered[actualIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isCorrect ? 'correct-fb' : 'wrong-fb'} show">
+        ${isCorrect ? '✓ Corect! ' : '✗ Greșit! '}${q.explanation}
+      </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="q-meta">
+        <span class="q-num">#${globalIdx + 1}</span>
+        <span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span>
+      </div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>
+      ${fbHtml}
+    `;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(qIdx, optIdx) {
+  if (answered[qIdx] !== undefined) return;
+  answered[qIdx] = optIdx;
+  const q = questions[qIdx];
+  if (optIdx === q.correct) correctCount++;
+  else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '✓ ' + correctCount;
+  document.getElementById('wrong-count').textContent = '✗ ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% răspunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleQuestions() {
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [q.opts[i], q.opts[j]] = [q.opts[j], q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {};
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q, i) => {
+    if (answered[i] === undefined) answered[i] = q.correct;
+  });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>
