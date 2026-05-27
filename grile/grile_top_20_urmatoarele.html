@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top 20 Următoarele Cele Mai Frecvente — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:18px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+#stats{display:flex;gap:12px;font-size:12px;color:var(--text-muted);}
+#stats span{background:var(--surface2);padding:3px 10px;border-radius:20px;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#container{max-width:800px;margin:0 auto;padding:28px 20px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.q-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-freq{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.3);font-weight:600;}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.cat-pandas{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3);}
+.cat-python{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3);}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-teorie{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-text{font-size:13px;line-height:1.5;}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#a7f3d0;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:32px;font-weight:700;color:var(--accent-light);}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>🔥 Top 20 Urm\u0103toarele Cele Mai Frecvente Grile</h1>
+  <div id="stats">
+    <span id="total-count">20 grile</span>
+    <span style="color:var(--green)" id="correct-count">\u2713 0</span>
+    <span style="color:var(--red)" id="wrong-count">\u2717 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleAll()">\uD83D\uDD00 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">\u21BA Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">\uD83D\uDC41 R\u0103spunsuri</button>
+</div>
+<div id="container">
+  <div id="score-box"><h2 id="score-text">0/0</h2><p id="score-pct" style="color:var(--text-muted);margin-top:6px;"></p></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('sas',this)">SAS</button>
+    <button class="filter-btn" onclick="filterCat('pandas',this)">Pandas</button>
+    <button class="filter-btn" onclick="filterCat('python',this)">Python</button>
+    <button class="filter-btn" onclick="filterCat('teorie',this)">Teorie</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+<script>
+const questions = [
+{cat:"sas",text:'DATALINES \u00een SAS:',opts:['a) Permite citirea datelor dintr-un fi\u0219ier extern de tip text','b) Permite introducerea \u00eenregistr\u0103rilor \u00een cod (\u00een sec\u021biunea de date)','c) Define\u0219te o bibliotec\u0103 temporar\u0103 \u00een WORK','d) Concateneaz\u0103 dou\u0103 seturi de date pe vertical\u0103'],correct:1,ex:'DATALINES (sau CARDS) permite introducerea datelor DIRECT \u00een corpul programului SAS, \u00een DATA step, f\u0103r\u0103 fi\u0219ier extern. Datele se plaseaz\u0103 dup\u0103 DATALINES \u0219i \u00eenainte de punctul (;) care marcheaz\u0103 sf\u00e2r\u0219itul.',freq:4},
+{cat:"sas",text:'Fi\u0219ierele temporare SAS:',opts:['a) Au numele pe DOU\u0102 NIVELURI (bibliotec\u0103.set)','b) Au numele pe UN SINGUR NIVEL (biblioteca WORK) \u0219i se salveaz\u0103 automat \u00een WORK','c) Sunt stocate pe disc \u0219i nu se \u0219terg niciodat\u0103','d) Trebuie \u0219terse manual de utilizator'],correct:1,ex:'Seturile de date temporare \u00een SAS sunt create \u00een biblioteca WORK, au nume pe un singur nivel (ex: "us" = work.us), \u0219i sunt \u0219terse automat la sf\u00e2r\u0219itul sesiunii.',freq:4},
+{cat:"sas",text:'O variabil\u0103 AcctNum con\u021bine valorile: 3456_1, Romano, Choi (mix de numere \u0219i text). Ce tip de date va avea aceast\u0103 variabil\u0103 \u00een SAS?',opts:['a) CHARACTER','b) NUMERIC','c) DATE','d) MIXED'],correct:0,ex:'\u00cen SAS, dac\u0103 o coloan\u0103 con\u021bine m\u0103car o valoare non-numeric\u0103 (litere, caractere speciale), \u00eentreaga coloan\u0103 este CARACTER. Tipul "MIXED" NU exist\u0103 \u00een SAS.',freq:4},
+{cat:"python",text:'Valorile extreme \u00een Python (afirma\u021bie adev\u0103rat\u0103):',opts:['a) Nu afecteaz\u0103 modelele de \u00eenv\u0103\u021bare automat\u0103','b) Se trateaz\u0103 la fel ca valorile lips\u0103','c) Nu trebuie tratate niciodat\u0103','d) Tratarea lor este obligatorie c\u00e2nd antren\u0103m algoritmi de machine learning'],correct:3,ex:'Valorile extreme pot distorsiona semnificativ modelele ML. \u00cen coloane non-numerice, valorile extreme sunt \u0219iruri cu frecven\u021be mici care pot fi grupate \u00een "altele".',freq:3},
+{cat:"python",text:'salary = 8000\ndef printSalary():\n   salary = 12000\n   print("Salary:", salary)\nprintSalary()\nprint(salary)\nCe se afi\u0219eaz\u0103?',opts:['a) Salary: 12000 / Salary: 12000','b) Salary: 12000 / Salary: 8000','c) Salary: 8000 / Salary: 8000','d) Error: variabila salary nu este definit\u0103'],correct:1,ex:'Variabilele create \u00een interiorul unei func\u021bii sunt LOCALE. salary=12000 e local\u0103, salary=8000 e global\u0103. Prima print (din func\u021bie) = 12000. A doua (afar\u0103) = 8000.',freq:3},
+{cat:"sas",text:'SAS — afi\u0219are metadate (nume, tip, lungime variabile):',opts:['a) proc print data=facultate.studenti; run;','b) proc means data=facultate.studenti; run;','c) proc contents data=facultate.studenti; run;','d) proc format data=facultate.studenti; run;'],correct:2,ex:'PROC CONTENTS afi\u0219eaz\u0103 metadate: nume variabile, tip (numeric/caracter), lungime, format, etichete, num\u0103r de observa\u021bii, etc.',freq:3},
+{cat:"sas",text:'Pasul folosit de obicei pentru rapoarte \u0219i grafice \u00een SAS se nume\u0219te:',opts:['a) DATA step','b) MACRO','c) PROC','d) LIBNAME'],correct:2,ex:'Programul SAS are dou\u0103 sec\u021biuni principale: DATA step (creare/prelucrare date) \u0219i PROC step (proceduri pentru rapoarte, analize, grafice).',freq:3},
+{cat:"teorie",text:'"Utilizatorul autorizat NU poate analiza sau studia programul f\u0103r\u0103 autorizarea expres\u0103 a autorului." Aceast\u0103 afirma\u021bie este:',opts:['a) ADEV\u0102RAT\u0102','b) FALS\u0102 — utilizatorul autorizat ARE dreptul s\u0103 analizeze/studieze programul'],correct:1,ex:'Conform legii dreptului de autor, utilizatorul autorizat are dreptul s\u0103 studieze \u0219i s\u0103 analizeze programul. Copia de arhiv\u0103 e permis\u0103. NU e permis\u0103 reproducerea/traducerea f\u0103r\u0103 autorizare.',freq:3},
+{cat:"teorie",text:'Clasa de criterii de UTILIZABILITATE pentru alegerea unui produs software include:',opts:['a) Interfa\u021ba utilizator, tipuri de utilizatori, vizualizarea datelor, raportarea erorilor, varietatea domeniului','b) Costul licen\u021bei, perioada de garan\u021bie, pre\u021bul actualiz\u0103rilor','c) Limbajul de programare, sistemul de operare, baza de date','d) Viteza procesorului, memoria RAM, spa\u021biul pe disc'],correct:0,ex:'Criterii de UTILIZABILITATE: interfa\u021b\u0103, tipuri de utilizatori, vizualizare date, raportare erori, varietatea domeniului. Altele: (b)=\u00e2nzare, (c)(d)=tehnice.',freq:3},
+{cat:"teorie",text:'Shareware reprezint\u0103:',opts:['a) Software distribuit gratuit, cu codul surs\u0103 disponibil','b) Software LIBER care poate fi modificat \u0219i redistribuit','c) Software PROPRIETAR furnizat gratuit pentru o perioad\u0103 LIMITAT\u0102 de testare','d) Software care nu necesit\u0103 nicio licen\u021b\u0103'],correct:2,ex:'Shareware = model de distribu\u021bie pentru software proprietar, gratuit pentru trial. Dup\u0103 expirare, utilizatorul pl\u0103te\u0219te. Freeware = gratuit, sursa indisponibil\u0103.',freq:3},
+{cat:"pandas",text:'Python pandas: pd.merge(df1, df2, how="outer", indicator=True). Care e efectul parametrului indicator=True?',opts:['a) Adaug\u0103 o coloan\u0103 (_merge) care arat\u0103 dac\u0103 r\u00e2ndul provine din st\u00e2nga, dreapta sau ambele seturi','b) Indic\u0103 faptul c\u0103 rezultatul va fi afi\u0219at pe ecran','c) Afi\u0219eaz\u0103 un grafic cu distribu\u021bia datelor','d) Adaug\u0103 numere de index pentru fiecare r\u00e2nd'],correct:0,ex:'indicator=True adaug\u0103 coloana "_merge" cu valori: "left_only", "right_only" sau "both". Util pentru a identifica provenien\u021ba r\u00e2ndurilor dup\u0103 un merge.',freq:2},
+{cat:"teorie",text:'Clasificarea cloud-ului \u00een func\u021bie de AMPLASARE include:',opts:['a) Public, Private, Hybrid, Community','b) PaaS, IaaS, SaaS','c) Local, Remote, Distributed, Centralized','d) Free, Paid, Subscription, Enterprise'],correct:0,ex:'Dup\u0103 AMPLASARE: Public, Private, Hybrid, Community. PaaS/IaaS/SaaS = clasificare dup\u0103 TIPUL DE SERVICII.',freq:2},
+{cat:"sas",text:'Metoda de citire "coloane de intrare" (column input) \u00een SAS:',opts:['a) Cite\u0219te date delimitate prin spa\u021biu','b) Poate citi datele \u00een orice ordine necesar\u0103 \u0219i se aplic\u0103 fi\u0219ierelor text cu L\u0102\u021aIME FIX\u0102','c) Cite\u0219te doar fi\u0219iere de tip Excel','d) Necesit\u0103 un fi\u0219ier de tip CSV'],correct:1,ex:'Column input specific\u0103 coloanele de \u00eenceput \u0219i sf\u00e2r\u0219it pentru fiecare variabil\u0103. Se aplic\u0103 fi\u0219ierelor text cu l\u0103\u021bime FIX\u0102. Poate citi variabilele \u00een ORICE ordine.',freq:2},
+{cat:"sas",text:'Cod SAS cu SELECT(Categorie); WHEN ("legume","fructe") DO; Reducere=0.25; IF Pret_vanzare le 10 THEN reducere=0.2; END; ... Acest cod:',opts:['a) Genereaz\u0103 eroare de sintax\u0103','b) Folose\u0219te IF \u00een interiorul grupului DO — corect sintactic','c) Selecteaz\u0103 doar categoria "cosmetice"','d) Define\u0219te un format de afi\u0219are'],correct:1,ex:'SELECT-WHEN e procesare condi\u021bional\u0103. IF simplu \u00een interiorul DO e corect. WHEN poate avea DO ... END pentru multiple instruc\u021biuni.',freq:2},
+{cat:"sas",text:'Cerin\u021b\u0103 de sintax\u0103 SAS:',opts:['a) Fiecare declara\u021bie trebuie s\u0103 \u00eenceap\u0103 cu PROC','b) Variabilele trebuie declarate \u00een sec\u021biunea DATA','c) Toate comenzile se scriu cu litere mari','d) Termina\u021bi fiecare declara\u021bie cu PUNCT \u0218I VIRGUL\u0102 (;)'],correct:3,ex:'Cea mai fundamental\u0103 regul\u0103 SAS: fiecare instruc\u021biune (statement) se termin\u0103 cu punct \u0219i virgul\u0103 (;). F\u0103r\u0103 aceasta, SAS nu poate parse corect.',freq:2},
+{cat:"sas",text:'O tabel\u0103 "o \u00eenregistrare per subiect" poate fi creat\u0103 prin:',opts:['a) PROC SORT','b) TRANSPUNERE (PROC TRANSPOSE)','c) PROC PRINT','d) PROC FORMAT'],correct:1,ex:'PROC TRANSPOSE transform\u0103 r\u00e2nduri \u00een coloane \u0219i invers. Convertet\u0103 format "lung" \u2192 "lat" (o \u00eenregistrare per subiect cu multiple coloane).',freq:2},
+{cat:"sas",text:'Biblioteca SAS/STAT ofer\u0103:',opts:['a) Instrumente pentru gestionarea fi\u0219ierelor','b) Analiza statistic\u0103 a datelor','c) Crearea de rapoarte \u00een format HTML','d) Conectarea la baze de date externe'],correct:1,ex:'SAS/STAT con\u021bine proceduri pentru analiz\u0103 statistic\u0103 avansat\u0103: regresie, ANOVA, analiz\u0103 multivariat\u0103, serii temporale etc.',freq:2},
+{cat:"sas",text:'Expresia "medie = (nota1 + nota2) / 2" \u00eentr-un DATA step SAS creeaz\u0103 o variabil\u0103 de tip:',opts:['a) CALCULAT\u0102','b) DERIVAT\u0102','c) AGREGAT\u0102','d) GLOBAL\u0102'],correct:0,ex:'Variabil\u0103 CALCULAT\u0103 = creat\u0103 prin combinarea altor variabile \u00eentr-o expresie. CASE WHEN \u00een SQL creeaz\u0103 coloan\u0103 RECODIFICAT\u0102.',freq:2},
+{cat:"python",text:'Python: note=[7,9,6,10]; rezultat=sorted(note); print(note[0], rezultat[0])',opts:['a) 6 6','b) 7 6','c) 7 7','d) 6 7'],correct:1,ex:'sorted() creeaz\u0103 o list\u0103 NOU\u0102 sortat\u0103, f\u0103r\u0103 a modifica originalul. note[0]=7 (neschimbat), rezultat[0]=6 (minimul din lista sortat\u0103).',freq:2},
+{cat:"python",text:'t = (1, 2, 4, 3, 8, 9)\nCare este rezultatul: [t[i] for i in range(0, len(t), 2)]?',opts:['a) [1, 2, 4, 3, 8, 9]','b) [2, 3, 9]','c) [1, 3, 9]','d) [1, 4, 8]'],correct:3,ex:'range(0, len(t), 2) = indicii 0, 2, 4. t[0]=1, t[2]=4, t[4]=8. Rezultat: [1, 4, 8]. List comprehension = metod\u0103 concis\u0103 de generare a listelor.',freq:2}
+];
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, dispIdx) => {
+    const globalIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card';
+    div.id = 'q-' + globalIdx;
+    const letters = ['a','b','c','d'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[globalIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[globalIdx] && answered[globalIdx] !== q.correct) cls += ' wrong';
+      }
+      const letter = letters[i] || String.fromCharCode(97 + i);
+      return `<div class="${cls}" onclick="selectAnswer(${globalIdx},${i})">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`;
+    }).join('');
+    let fbHtml = '';
+    if (answered[globalIdx] !== undefined) {
+      const isC = answered[globalIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isC?'correct-fb':'wrong-fb'} show">${isC?'\u2713 Corect! ':'\u2717 Gre\u0219it! '}${q.ex}</div>`;
+    }
+    div.innerHTML = `<div class="q-meta"><span class="q-num">#${dispIdx+1}</span><span class="q-freq">Apare de ${q.freq} ori</span><span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span></div>
+      <div class="q-text">${q.text.replace(/\n/g,'<br>')}</div>
+      <div class="options">${optsHtml}</div>${fbHtml}`;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(gi, oi) {
+  if (answered[gi] !== undefined) return;
+  answered[gi] = oi;
+  if (oi === questions[gi].correct) correctCount++; else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '\u2713 ' + correctCount;
+  document.getElementById('wrong-count').textContent = '\u2717 ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% r\u0103spunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleAll() {
+  for (let i = questions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [q.opts[i],q.opts[j]] = [q.opts[j],q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q,i) => { if (answered[i]===undefined) answered[i]=q.correct; });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>

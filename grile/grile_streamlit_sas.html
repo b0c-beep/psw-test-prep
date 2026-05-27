@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grile Streamlit + SAS — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:18px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+#stats{display:flex;gap:12px;font-size:12px;color:var(--text-muted);}
+#stats span{background:var(--surface2);padding:3px 10px;border-radius:20px;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#container{max-width:800px;margin:0 auto;padding:28px 20px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.q-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.q-text{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+pre.q-code{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);margin:8px 0 12px;line-height:1.6;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-text{font-size:13px;line-height:1.5;}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#a7f3d0;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:32px;font-weight:700;color:var(--accent-light);}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>Grile Streamlit + SAS — PSW</h1>
+  <div id="stats">
+    <span id="total-count">50 grile</span>
+    <span style="color:var(--green)" id="correct-count">✓ 0</span>
+    <span style="color:var(--red)" id="wrong-count">✗ 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleAll()">🔀 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">↺ Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">👁 Răspunsuri</button>
+</div>
+<div id="container">
+  <div id="score-box"><h2 id="score-text">0/0</h2><p id="score-pct" style="color:var(--text-muted);margin-top:6px;"></p></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('streamlit',this)">Streamlit</button>
+    <button class="filter-btn" onclick="filterCat('sas',this)">SAS</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+<script>
+const questions = [
+// ===== STREAMLIT (25 grile) =====
+{cat:"streamlit",text:"Cum se adaugă o bară de progres care se actualizează dinamic în Streamlit?",opts:["st.progress_bar(value)","progress = st.progress(0); progress.progress(new_val)","st.bar(value)","st.loading(value)"],correct:1,ex:"st.progress(initial) returnează un obiect. Metoda .progress(new_value) actualizează bara ulterior."},
+{cat:"streamlit",text:"Ce face 'if st.button('Click'): st.write('Apăsat')'?",opts:["Scrie 'Apăsat' la încărcarea paginii","Scrie 'Apăsat' DOAR când butonul e apăsat","Desenează un buton fără funcție","Eroare — st.button nu poate fi în if"],correct:1,ex:"st.button() returnează True la click. La rerun, if-ul se execută și afișează mesajul doar dacă butonul a fost apăsat."},
+{cat:"streamlit",text:"Ce face st.columns(2) vs st.columns([2,1])?",opts:["st.columns(2) = 2 coloane egale; st.columns([2,1]) = 2 coloane cu proporțiile 2:1","Sunt identice","st.columns(2) eroare — trebuie listă","st.columns([2,1]) creează 3 coloane"],correct:0,ex:"st.columns(n) = n coloane egale. st.columns([2,1]) = 2 coloane cu lățimi proporționale 2:1 (prima dublă față de a doua)."},
+{cat:"streamlit",text:"Cum se face o aplicație Streamlit să ruleze pe un port specific (ex: 8888)?",opts:["streamlit run app.py --port 8888","streamlit run app.py 8888","streamlit run app.py -p 8888","streamlit run app.py server.port=8888"],correct:0,ex:"streamlit run app.py --server.port 8888 sau streamlit run app.py --port 8888."},
+{cat:"streamlit",text:"Ce face st.help(pd.DataFrame) în Streamlit?",opts:["Afișează documentația pentru pd.DataFrame într-un tooltip","Deschide pagina de help a pandas","Afișează într-un expander docstring-ul obiectului — util pentru debugging","Trimite un ticket de help"],correct:2,ex:"st.help(obiect) afișează docstring-ul și semnătura oricărui obiect Python. Util pentru introspecție rapidă."},
+{cat:"streamlit",text:"Cum se ascunde un widget în Streamlit în funcție de o condiție?",opts:["Nu se poate — toate widget-urile sunt mereu vizibile","if cond: st.button('x') — widget-ul apare/ dispare în funcție de condiție","st.button('x', visible=cond)","st.hide_if(cond, st.button('x'))"],correct:1,ex:"Pui widget-ul într-un if. Dacă condiția e False, widget-ul NU e renderizat deloc (nici măcar invizibil)."},
+{cat:"streamlit",text:"Cum se afișează datele dintr-un fișier CSV uploadat cu st.file_uploader?",opts:["pd.read_csv(st.file_uploader('file'))","uploaded = st.file_uploader('file', type='csv'); if uploaded: df = pd.read_csv(uploaded)","csv = st.upload_csv('file'); df = pd.DataFrame(csv)","st.file_uploader().to_dataframe()"],correct:1,ex:"st.file_uploader() returnează un obiect UploadedFile (sau None). pd.read_csv(uploaded) îl citește direct."},
+{cat:"streamlit",text:"Ce valoare returnează st.checkbox('A') în starea implicită (nebifat)?",opts:["None","False","0","''"],correct:1,ex:"st.checkbox() returnează boolean. Implicit (nebifat) = False. Bifat = True."},
+{cat:"streamlit",text:"Ce face st.experimental_rerun() (sau st.rerun())?",opts:["Repornește serverul Streamlit","Re-execută scriptul de la început — forțează o rerulare","Resetează session_state","Reîncarcă pagina în browser"],correct:1,ex:"st.rerun() forțează re-executarea completă a scriptului. Util după modificarea session_state pentru a actualiza UI-ul."},
+{cat:"streamlit",text:"Cum se numără de câte ori s-a apăsat un buton în Streamlit?",opts:["count = 0; if st.button('+'): count += 1","if 'count' not in st.session_state: st.session_state.count = 0; if st.button('+'): st.session_state.count += 1","st.counter(0) + st.button('+')","count = st.memory(0); if st.button('+'): count += 1"],correct:1,ex:"Variabilele normale se RESETEAZĂ la fiecare rerun. Trebuie folosit session_state pentru a persista counter-ul."},
+{cat:"streamlit",text:"Ce afișează st.write('Hello', 'World', 123)?",opts:["'Hello World 123'","Trei elemente separate (Hello, World, 123)","Eroare — st.write acceptă un singur argument","Doar 'Hello'"],correct:0,ex:"st.write() acceptă multiple argumente și le concatenează în același element (cu spațiu între)."},
+{cat:"streamlit",text:"Cum se afișează un text cu dimensiunea cea mai mică (subtitlu) în Streamlit?",opts:["st.small('text')","st.caption('text')","st.mini('text')","st.footnote('text')"],correct:1,ex:"st.caption() afișează text cu font mic, ideal pentru note, surse, legende."},
+{cat:"streamlit",text:"Ce face st.info('Mesaj')?",opts:["Afișează un mesaj cu FUNDAL ALBASTRU — informație generală","Afișează un pop-up informativ","Deschide o pagină de info","Trimite un mesaj în log"],correct:0,ex:"st.info() = fundal ALBASTRU. st.success() = verde. st.warning() = galben. st.error() = roșu."},
+{cat:"streamlit",text:"Cum se creează un grafic cu bare în Streamlit?",opts:["st.bar(data)","st.bar_chart(data)","st.barplot(data)","st.plot(kind='bar', data)"],correct:1,ex:"st.bar_chart(data) = grafic cu bare built-in. st.line_chart() = linii. st.area_chart() = arii."},
+{cat:"streamlit",text:"Cum se previne re-executarea unei funcții costisitoare la fiecare rerun?",opts:["Se execută mereu — nu se poate evita","@st.cache_data — cachează rezultatul pe baza argumentelor","Cu st.memo()","Cu st.prevent_rerun()"],correct:1,ex:"@st.cache_data (recomandat) sau @st.cache (mai vechi) cachează rezultatul funcției. La rerun cu aceleași argumente, returnează valoarea din cache."},
+{cat:"streamlit",text:"Ce face st.selectbox('Alege', ['A','B'], index=1)?",opts:["Selectează prima opțiune (A)","Selectează a DOUA opțiune (B) — index=1","Eroare — index= nu există","Selectează opțiunea cu valoarea 1"],correct:1,ex:"index= specifică poziția opțiunii selectate implicit (0-based). index=1 = a doua opțiune 'B'."},
+{cat:"streamlit",text:"Ce se întâmplă dacă nu pui st.set_page_config() ca prim apel?",opts:["Funcționează normal","Eroare — StreamlitPageConfigurationError","Aplicația pornește cu setări default","Se aplică setările oriunde"],correct:1,ex:"Dacă există ORICE alt element Streamlit înainte de set_page_config, se generează eroare."},
+{cat:"streamlit",text:"Cum se creează un formular cu 2 câmpuri și un buton Submit?",opts:["with st.form('f'): st.text_input('Nume'); st.number_input('Vârsta'); st.form_submit_button('Submit')","st.form('f', [st.text_input('Nume'), st.number_input('Vârsta'), st.button('Submit')])","st.build_form([...])","st.form_start(); st.text_input('Nume'); st.form_end()"],correct:0,ex:"with st.form(): conține widget-urile + st.form_submit_button(). Submit trimite toate valorile O DATĂ."},
+{cat:"streamlit",text:"Cum se afișează o listă de elemente (bullet list) în Streamlit?",opts:["st.list(['a','b','c'])","st.markdown('- a\\n- b\\n- c')","st.bullets(['a','b','c'])","st.ul(['a','b','c'])"],correct:1,ex:"Streamlit nu are funcție specifică de bullet list. Se folosește st.markdown() cu sintaxa markdown: '- item\\n- item'."},
+{cat:"streamlit",text:"Ce face st.audio('song.mp3')?",opts:["Redă fișierul audio cu un player încorporat","Afișează textul melodiei","Descarcă fișierul","Afișează spectrul audio"],correct:0,ex:"st.audio() afișează un player audio HTML5. Acceptă fișier local, URL sau bytes."},
+{cat:"streamlit",text:"Cum se adaugă o bifă (checkbox) în SIDEBAR?",opts:["sidebar.checkbox('A')","st.sidebar.checkbox('A')","st.sidebar.checkbox('A') — trebuie prefixat cu st.sidebar.","st.checkbox_sidebar('A')"],correct:2,ex:"st.sidebar.<widget>() plasează widget-ul în bara laterală. Ex: st.sidebar.checkbox('Bifează')."},
+{cat:"streamlit",text:"Ce face 'with st.spinner('Loading...'): time.sleep(2)'?",opts:["Afișează 'Loading...' și un spinner 2 secunde, apoi dispare","Așteaptă 2 sec fără feedback","Creează o animație permanentă","Eroare — spinner nu există"],correct:0,ex:"st.spinner() afișează un indicator de încărcare în timpul execuției codului din blocul with. Dispare automat."},
+{cat:"streamlit",text:"Cum se resetează o valoare din session_state la o anumită acțiune?",opts:["Nu se poate — session_state e persistent","if st.button('Reset'): st.session_state.counter = 0","st.session_state.clear() și re-inițializezi","st.reset_session('counter')"],correct:1,ex:"Poți modifica direct valoarea: st.session_state.cheie = valoare_nouă. După reset, la rerun se va folosi noua valoare."},
+{cat:"streamlit",text:"Ce se întâmplă când apelezi st.write(df) pentru un DataFrame?",opts:["Afișează un tabel static","Afișează un tabel INTERACTIV (scroll, sortare) — echivalent cu st.dataframe()","Afișează df.info()","Eroare"],correct:1,ex:"st.write() detectează automat tipul: pentru DataFrame, afișează un tabel interactiv (ca st.dataframe())."},
+{cat:"streamlit",text:"Cum se creează o aplicație cu două pagini (multi-page)?",opts:["Se definește în același fișier cu funcții","Se creează folder 'pages/' cu fișiere .py separate (ex: pages/acasa.py, pages/despre.py)","Cu st.multi_page(['Pag1','Pag2'])","Cu st.navigation(['Pag1','Pag2'])"],correct:1,ex:"Streamlit detectează automat fișierele .py din folderul 'pages/' și le adaugă ca pagini separate în sidebar."},
+
+// ===== SAS (25 grile) =====
+{cat:"sas",text:"Ce face 'data a; x=5; do i=1 to x; x=x+1; end; run;'? (valoarea lui x după buclă)",opts:["5 — bucla nu se execută","10 — i merge până la 5, x crește la 10","Buclă INFINITĂ — x crește la fiecare iterație, iar condiția 'to x' se tot extinde","6 — o singură iterație"],correct:2,ex:"Capătul buclei 'to x' e evaluat O SINGURĂ DATĂ la intrarea în buclă. i=1..5. x pornește 5, după fiecare iterare x+1, la final x=10."},
+{cat:"sas",text:"Ce face PROC PRINT cu opțiunea LABEL?",opts:["Adaugă etichete noi","Afișează ETICHETELE variabilelor (în locul numelor) la antetul coloanelor","Creează etichete permanente","Scoate etichetele"],correct:1,ex:"LABEL în PROC PRINT = afișează etichetele ca antete. Fără LABEL, afișează numele variabilelor."},
+{cat:"sas",text:"Ce face 'data a; set b; if x > 10; run;' (IF fără THEN)?",opts:["EROARE — IF trebuie să aibă THEN","Creează subset: păstrează DOAR observațiile cu x>10 (IF subset)","Filtrează coloanele","Adaugă o variabilă nouă"],correct:1,ex:"IF expresie; fără THEN = SUBSET. Dacă expresia e falsă, observația e exclusă din setul de ieșire."},
+{cat:"sas",text:"Cum se citește un fișier cu delimitator TAB în SAS?",opts:["infile 'f.txt' dlm='\\t';","infile 'f.txt' dlm='09'x;","infile 'f.txt' delimiter=tab;","infile 'f.txt' dsd;"],correct:1,ex:"TAB = '09'x (hexazecimal). DLM='09'x indică delimitator TAB. '\\t' nu e recunoscut în SAS."},
+{cat:"sas",text:"Ce face 'proc print data=a; sum venit; run;'?",opts:["Calculează suma venitului și o afișează la sfârșitul raportului (total row)","Sumează veniturile pe fiecare pagină","Creează un set separat cu suma","Eroare — SUM nu există în PROC PRINT"],correct:0,ex:"SUM în PROC PRINT adaugă un rând de TOTAL la sfârșit pentru variabilele specificate."},
+{cat:"sas",text:"Ce face 'proc sql; create view v as select * from a; quit;'?",opts:["Creează un set de date fizic 'v'","Creează un VIEW (tabelă VIRTUALĂ) — nu stochează date, ci definiția interogării","Creează un index","Creează o bibliotecă"],correct:1,ex:"CREATE VIEW = VIEW (tabelă virtuală). La accesare, re-execută SELECT-ul. Ocupă puțin spațiu, reflectă datele curente."},
+{cat:"sas",text:"Cum se numește operatorul '^=' în SAS?",opts:["EQ","NE (NOT EQUAL)","LE","GE"],correct:1,ex:"^= sau ¬= sau ~= = NE (not equal). ^= e operatorul de NEGARE a egalității."},
+{cat:"sas",text:"Ce face PROC PRINT DATA=a; BY Sex; RUN; fără sortare prealabilă după Sex?",opts:["Funcționează — sortează automat","Afisează un avertisment dar funcționează","EROARE — BY în PROC necesită date sortate","Ignoră BY și afișează normal"],correct:2,ex:"BY în orice PROC necesită date SORTATE în prealabil (cu PROC SORT). Fără sortare, SAS generează eroare."},
+{cat:"sas",text:"Ce face 'proc means data=a n mean std min max; var x; run;'?",opts:["Calculează și afișează: N (count), mean, std, min, max pentru x","Creează un set cu aceste statistici","Graficul distribuției","Nimic — opțiuni invalide"],correct:0,ex:"Opțiunile N MEAN STD MIN MAX specifică ce indicatori să fie calculați și afișați."},
+{cat:"sas",text:"Ce face 'input @1 Nume $10. @12 Pret 8.2;' (formatted input)?",opts:["Eroare — formatul 8.2 e invalid la input","Citește Nume de la col 1, 10 caractere; Pret de la col 12, 8 caractere cu 2 zecimale","Nu specifică delimitator — eroare","Citește doar prima linie"],correct:1,ex:"Formatted input: @poziție Variabilă Format. $10. = caracter 10 caractere. 8.2 = numeric, 8 caractere, 2 zecimale implicite."},
+{cat:"sas",text:"Ce face 'if Sex = 'F' then do; Height = Height * 0.9; Weight = Weight * 0.85; end;'?",opts:["Modifică doar Height","Modifică Height și Weight DOAR când Sex='F' (DO grup = multiple instrucțiuni)","Eroare — DO fără END","Modifică pentru toate observațiile"],correct:1,ex:"IF-THEN execută o singură instrucțiune. Pentru MULTIPLE instrucțiuni, se folosește DO ... END."},
+{cat:"sas",text:"Ce returnează funcția MISSING(x)?",opts:["True (1) dacă x e valoare lipsă, False (0) dacă nu","Numărul de valori lipsă","Setează x la valoarea lipsă","Șterge x"],correct:0,ex:"MISSING(x) = funcție logică. Returnează 1 (adevărat) dacă x e lipsă, 0 (fals) dacă x are valoare."},
+{cat:"sas",text:"Ce face 'proc freq data=a; tables x y; run;'?",opts:["Tabel de frecvență DOAR pentru x","Tabel de frecvență pentru x ȘI pentru y (separat)","Tabel încrucișat x CU y","Grafic pentru x și y"],correct:1,ex:"TABLES x y; = două tabele separate (frecvențe pentru x, apoi frecvențe pentru y). TABLES x*y; = tabel încrucișat."},
+{cat:"sas",text:"Ce face 'data b; retain total 0; set a; total = total + x; run;' vs acumulator?",opts:["La fel ca 'total+x;' (fără =)","RETAIN + atribuire = ACEȘI rezultat ca acumulatorul, dar RETAIN e explicit","RETAIN e diferit — necesită SUM","Eroare — RETAIN nu există"],correct:1,ex:"RETAIN total 0; inițializează total cu 0 și PĂSTREAZĂ valoarea între observații. total = total + x; = același efect ca acumulatorul 'total+x;'."},
+{cat:"sas",text:"Ce face 'proc sort data=a; by x; run; proc sort data=a; by y; run;' (fără out=)?",opts:["Creează două seturi sortate","MODIFICĂ setul a de două ori — după primul SORT, a e sortat după x; după al doilea, a e sortat după y","Eroare — nu poți sorta același set de două ori","Ignoră al doilea SORT"],correct:1,ex:"Fără OUT=, PROC SORT MODIFICĂ setul original. Primul SORT sortează a după x. Al doilea SORT rescrie a sortat după y."},
+{cat:"sas",text:"Ce face 'proc format; value $gen 'M'='Masculin' 'F'='Feminin'; run;'? (fără OTHER)",opts:["Valorile neacoperite rămân NEFORMATATE (afișate ca valoarea originală)","Toate devin 'Masculin'","Eroare — OTHER e obligatoriu","Valorile neacoperite devin spațiu"],correct:0,ex:"Fără 'other=' (și fără 'other' — nu 'otherwise' care e pentru SELECT), valorile nespecificate rămân NESCHIMBATE."},
+{cat:"sas",text:"Ce face 'option nocenter;' în SAS?",opts:["Aliniază output-ul la STÂNGA (nu mai e centrat)","Ascunde output-ul","Nu afișează nimic","Setează opțiunile implicite"],correct:0,ex:"Implicit, SAS output e centrat. 'option nocenter;' aliniază la stânga. Opțiuni globale: pagesize=, linesize=, date, nonumber."},
+{cat:"sas",text:"Ce face funcția SUM în SAS vs operatorul + (ex: SUM(x, y) vs x + y)?",opts:["Sunt identice","SUM ignoră valorile lipsă; x+y returnează . dacă orice termen e lipsă","SUM e mai rapid","x+y ignoră lipsă; SUM nu"],correct:1,ex:"SUM(x,y,..) ignoră valorile LIPSĂ (sumează doar valorile existente). x + y returnează . dacă măcar un termen e lipsă."},
+{cat:"sas",text:"Ce face 'proc sql; select distinct x from a; quit;'?",opts:["Selectează DOAR valorile UNICE ale coloanei x (elimină duplicate)","Selectează toate valorile","Creează un index","Sortează x"],correct:0,ex:"DISTINCT în SQL elimină DUPLICATELE din rezultat. Similar cu unique() în pandas."},
+{cat:"sas",text:"Cum se redenumește o variabilă în DATA step (nu cu RENAME=)?",opts:["Nu se poate în DATA step","data b(rename=(vechi=nou)); set a; run;","rename vechi=nou;","data b; set a; vechi=nou; run;"],correct:1,ex:"Opțiunea RENAME= se pune pe SETUL DE IEȘIRE: data b(rename=(vechi=nou)); set a; run;. VARIABILA își schimbă numele."},
+{cat:"sas",text:"Ce face 'proc print data=a; where x between 10 and 20; run;'?",opts:["Afișează observațiile cu x între 10 și 20 (INCLUSIV)","Afișează observațiile cu x strict între 10 și 20","Eroare — BETWEEN nu există în WHERE","Afisează x între 10 și 20 exclusive"],correct:0,ex:"BETWEEN X AND Y = interval INCLUSIV la ambele capete. WHERE x BETWEEN 10 AND 20 = 10 ≤ x ≤ 20."},
+{cat:"sas",text:"Ce face 'proc contents data=a short; run;'?",opts:["Afișează doar numele variabilelor (listare scurtă)","Afișează informații detaliate","Creează un set de date","Eroare — SHORT nu există"],correct:0,ex:"Opțiunea SHORT în PROC CONTENTS afișează o listă SUCCINTĂ a variabilelor (doar numele, nu tip/lungime detaliat)."},
+{cat:"sas",text:"Ce face 'data a; set b; by x; if first.x then output; run;'?",opts:["Scrie toate observațiile","Scrie PRIMA observație din fiecare grup (BY) — elimină duplicatele","Scrie ultima observație din fiecare grup","Scrie doar x"],correct:1,ex:"IF first.x THEN OUTPUT; = scrie doar prima observație a fiecărui grup BY. Efect: păstrează prima valoare per grup."},
+{cat:"sas",text:"Ce face 'proc sql; select x, mean(y) as medie from a group by x; quit;'?",opts:["Eroare — AS nu e valid în SQL SAS","Calculează media lui y pentru fiecare valoare distinctă a lui x (grupare)","Calculează media totală","Sortează după x"],correct:1,ex:"GROUP BY x = grupează după x. mean(y) = media lui y per grup. AS medie = redenumește coloana rezultat."},
+{cat:"sas",text:"Ce face 'data a; set b; where x > 5; y = x * 2; run;' (WHERE + variabilă nouă)?",opts:["Eroare — WHERE nu poate fi combinat cu variabile noi","Creează subset (x>5) și adaugă variabila y=x*2 — WHERE în DATA step e valid doar pt variabile din INPUT","Creează y=x*2 pentru toate, apoi filtrează","WHERE e ignorat"],correct:1,ex:"WHERE în DATA step poate referi DOAR variabile din SETUL DE INTRARE. y = x*2 e variabilă NOUĂ (validă). WHERE se aplică înainte de crearea variabilelor noi."},
+];
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, dispIdx) => {
+    const globalIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card';
+    div.id = 'q-' + globalIdx;
+    const letters = ['a','b','c','d'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[globalIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[globalIdx] && answered[globalIdx] !== q.correct) cls += ' wrong';
+      }
+      const letter = letters[i] || String.fromCharCode(97 + i);
+      return `<div class="${cls}" onclick="selectAnswer(${globalIdx},${i})">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`;
+    }).join('');
+    let fbHtml = '';
+    if (answered[globalIdx] !== undefined) {
+      const isC = answered[globalIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isC?'correct-fb':'wrong-fb'} show">${isC?'✓ Corect! ':'✗ Greșit! '}${q.ex}</div>`;
+    }
+    div.innerHTML = `<div class="q-meta"><span class="q-num">#${dispIdx+1}</span><span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span></div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>${fbHtml}`;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(gi, oi) {
+  if (answered[gi] !== undefined) return;
+  answered[gi] = oi;
+  if (oi === questions[gi].correct) correctCount++; else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '✓ ' + correctCount;
+  document.getElementById('wrong-count').textContent = '✗ ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% răspunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleAll() {
+  for (let i = questions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [q.opts[i],q.opts[j]] = [q.opts[j],q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q,i) => { if (answered[i]===undefined) answered[i]=q.correct; });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>

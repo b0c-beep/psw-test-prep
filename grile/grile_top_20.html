@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top 20 Cele Mai Frecvente Grile — PSW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22253a;--border:#2d3154;--text:#e2e8f0;--text-muted:#94a3b8;--accent:#6366f1;--accent-light:#818cf8;--green:#10b981;--green-bg:rgba(16,185,129,.12);--red:#ef4444;--red-bg:rgba(239,68,68,.12);--yellow:#f59e0b;--blue:#3b82f6;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+#header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header h1{font-size:18px;font-weight:700;color:var(--accent-light);flex:1;}
+.ctrl-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent-light);}
+.ctrl-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+#stats{display:flex;gap:12px;font-size:12px;color:var(--text-muted);}
+#stats span{background:var(--surface2);padding:3px 10px;border-radius:20px;}
+#progress-bar{height:3px;background:var(--border);}
+#progress-fill{height:3px;background:var(--accent);transition:width .3s;}
+#container{max-width:800px;margin:0 auto;padding:28px 20px;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.q-meta{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.q-num{font-size:11px;font-weight:700;color:var(--text-muted);}
+.q-freq{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.3);font-weight:600;}
+.q-cat{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.cat-sas{background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3);}
+.cat-pandas{background:rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3);}
+.cat-python{background:rgba(251,146,60,.15);color:#fdba74;border:1px solid rgba(251,146,60,.3);}
+.cat-streamlit{background:rgba(255,75,75,.15);color:#fca5a5;border:1px solid rgba(255,75,75,.3);}
+.cat-teorie{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);}
+.q-text{font-size:14px;font-weight:500;margin-bottom:14px;line-height:1.6;}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a5b4fc;}
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s;user-select:none;}
+.opt:hover{border-color:var(--accent);background:rgba(99,102,241,.06);}
+.opt.correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt.wrong{border-color:var(--red)!important;background:var(--red-bg)!important;}
+.opt.reveal-correct{border-color:var(--green)!important;background:var(--green-bg)!important;}
+.opt-letter{width:24px;height:24px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.opt.correct .opt-letter,.opt.reveal-correct .opt-letter{background:var(--green);color:#fff;}
+.opt.wrong .opt-letter{background:var(--red);color:#fff;}
+.opt-text{font-size:13px;line-height:1.5;}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;display:none;line-height:1.6;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:var(--green-bg);border:1px solid var(--green);color:#a7f3d0;}
+.feedback.wrong-fb{background:var(--red-bg);border:1px solid var(--red);color:#fca5a5;}
+#score-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:center;display:none;}
+#score-box.show{display:block;}
+#score-box h2{font-size:32px;font-weight:700;color:var(--accent-light);}
+</style>
+</head>
+<body>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+<div id="header">
+  <h1>🔥 Top 20 Cele Mai Frecvente Grile din Cache</h1>
+  <div id="stats">
+    <span id="total-count">20 grile</span>
+    <span style="color:var(--green)" id="correct-count">✓ 0</span>
+    <span style="color:var(--red)" id="wrong-count">✗ 0</span>
+  </div>
+  <button class="ctrl-btn" onclick="shuffleAll()">🔀 Shuffle</button>
+  <button class="ctrl-btn" onclick="resetAll()">↺ Reset</button>
+  <button class="ctrl-btn primary" onclick="revealAll()">👁 Răspunsuri</button>
+</div>
+<div id="container">
+  <div id="score-box"><h2 id="score-text">0/0</h2><p id="score-pct" style="color:var(--text-muted);margin-top:6px;"></p></div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all',this)">Toate</button>
+    <button class="filter-btn" onclick="filterCat('sas',this)">SAS</button>
+    <button class="filter-btn" onclick="filterCat('pandas',this)">Pandas</button>
+    <button class="filter-btn" onclick="filterCat('python',this)">Python</button>
+    <button class="filter-btn" onclick="filterCat('streamlit',this)">Streamlit</button>
+    <button class="filter-btn" onclick="filterCat('teorie',this)">Teorie</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+<script>
+const questions = [
+{cat:"sas",text:'DATA date3; SET date1 date2; BY ID; RUN; realizeaz\u0103:',opts:['a) Concatenare','b) Interclasare','c) Fuziune','d) Jonc\u021biune'],correct:1,ex:'SET + BY = INTERCLASARE (merge interleaving). SET f\u0103r\u0103 BY = concatenare. BY interclaseaz\u0103 observa\u021biile dup\u0103 ordinea variabilei BY.',freq:18},
+{cat:"sas",text:'Func\u021bia PUT din SAS returneaz\u0103 \u00eentotdeauna o valoare de tip:',opts:['a) Numeric','b) Caracter','c) Dat\u0103','d) Boolean'],correct:1,ex:'PUT aplic\u0103 un format \u0219i returneaz\u0103 \u00eentotdeauna \u0218IR (caracter). Pentru rezultat numeric se folose\u0219te INPUT.',freq:14},
+{cat:"sas",text:'Combinare Magazin1+Magazin2 (rezultat cu TOATE r\u00e2ndurile din ambele):',opts:['a) Inner join','b) Full outer join sau right outer join','c) Left outer join','d) Cross join'],correct:1,ex:'Full outer join = toate r\u00e2ndurile din ambele tabele. Right outer join = toate r\u00e2ndurile din a doua tabel\u0103 (echivalent par\u021bial c\u00e2nd prima e inclus\u0103 \u00een a doua).',freq:13},
+{cat:"sas",text:'proc print data=work.studenti; where Sex eq \'F\' and (Proiect in (9 10) or examen eq 10); var Sex Activitate Proiect Examen; run; — Ce afi\u0219eaz\u0103?',opts:['a) Genereaz\u0103 eroare (WHERE nu e valid \u00een PROC PRINT)','b) Toate observa\u021biile din set','c) Doar observa\u021biile cu Sex=\'F\'','d) Observa\u021biile care satisfac condi\u021bia (Sex=\'F\' \u0219i (Proiect 9 sau 10 SAU examen=10))'],correct:3,ex:'WHERE \u00een PROC PRINT filtreaz\u0103 observa\u021biile. Condi\u021bia compus\u0103: Sex=\'F\' \u0219i (Proiect \u00een (9,10) sau Examen=10).',freq:12},
+{cat:"sas",text:'Declara\u021bia LIBNAME:',opts:['a) Define\u0219te un fi\u0219ier','b) Define\u0219te o BIBLIOTEC\u0102','c) Define\u0219te o variabil\u0103','d) Define\u0219te un format'],correct:1,ex:'LIBNAME asociaz\u0103 o denumire (bibliotec\u0103) cu un director fizic. WORK e biblioteca temporar\u0103 implicit\u0103.',freq:11},
+{cat:"sas",text:'Statistici descriptive pentru o variabil\u0103 NUMERIC\u0103 se pot ob\u021bine cu:',opts:['a) MEANS \u0219i UNIVARIATE','b) SORT \u0219i FORMAT','c) PRINT \u0219i MEANS','d) FREQ \u0219i SORT'],correct:0,ex:'PROC MEANS \u0219i PROC UNIVARIATE ofer\u0103 statistici descriptive numerice. PROC FREQ e pentru variabile categorice.',freq:10},
+{cat:"pandas",text:'Pandas: data.iloc[:, 0:3] selecteaz\u0103:',opts:['a) Primele 3 r\u00e2nduri','b) Primele 3 COLOANE','c) Toate coloanele','d) Toate r\u00e2ndurile \u0219i coloanele 0, 1, 2'],correct:1,ex:'iloc[:, 0:3] = toate r\u00e2ndurile (:) + coloanele 0, 1, 2. Se folose\u0219te pentru selec\u021bie pe POZI\u0218IE.',freq:8},
+{cat:"streamlit",text:'Care metod\u0103 este corect\u0103 \u00een Streamlit pentru a afi\u0219a con\u021binut \u00een aplica\u021bie?',opts:['a) st.display()','b) st.show()','c) st.print()','d) st.write()'],correct:3,ex:'st.write() e metoda universal\u0103 de afi\u0219are — detecteaz\u0103 automat tipul (text, DataFrame, grafic, etc.) \u0219i renderizeaz\u0103 corespunz\u0103tor.',freq:8},
+{cat:"python",text:'sampleList=["Jon","Kelly","Jessa"]; sampleList.append(2,"Scott"); print(...)',opts:['a) ["Jon","Kelly","Jessa",2,"Scott"]','b) ["Jon","Kelly","Jessa",[2,"Scott"]]','c) ERROR (append() accept\u0103 UN singur argument)','d) TypeError: list indices must be integers'],correct:2,ex:'append() prime\u0219te UN singur argument. Pentru mai multe elemente se folose\u0219te extend() sau append() \u00eentr-un tuplu/list\u0103.',freq:8},
+{cat:"sas",text:'Raport cu produsele care AU fost comandate (MERGE produse(in=P) comenzi(in=C); BY IDProdus):',opts:['a) IF P and C','b) IF P and NOT C','c) IF NOT P and C','d) IF P or C'],correct:0,ex:'IN= variabile boolean: P=1 dac\u0103 produsul exist\u0103 \u00een tabela produse, C=1 dac\u0103 exist\u0103 \u00een comenzi. IF P and C = produse comandate (match).',freq:8},
+{cat:"sas",text:'SAS — afi\u0219are doar Client, Valoare, Status dintr-un set SAS:',opts:['a) proc print data=comenzi; keep Client Valoare Status; run;','b) proc print data=comenzi; var Client Valoare Status; run;','c) proc print data=comenzi; select Client Valoare Status; run;','d) proc print data=comenzi; columns Client Valoare Status; run;'],correct:1,ex:'\u00cen PROC PRINT, VAR specific\u0103 ce variabile s\u0103 fie afi\u0219ate. KEEP e op\u021biune de DATA step, nu de PROC PRINT.',freq:7},
+{cat:"sas",text:'DATA date.studenti (KEEP=ID); SET stud; RUN; creaz\u0103:',opts:['a) Un set de date cu TOATE coloanele din stud','b) Un set de date gol','c) Un set de date cu O SINGUR\u0102 coloan\u0103 (doar ID)','d) Eroare (KEEP nu e valid \u00een DATA)'],correct:2,ex:'KEEP= pe setul de ie\u0219ire re\u021bine DOAR variabilele listate. DROP= le elimin\u0103. Efect: se scrie doar ID.',freq:7},
+{cat:"sas",text:'Declara\u021bia INPUT \u00een SAS:',opts:['a) Permite citirea datelor din fi\u0219iere FLAT','b) Define\u0219te formatul de afi\u0219are','c) Creeaz\u0103 o bibliotec\u0103','d) Define\u0219te variabilele de ie\u0219ire'],correct:0,ex:'INPUT cite\u0219te date din fi\u0219iere text plate (flat files). Se folose\u0219te \u00eempreun\u0103 cu INFILE \u00een DATA step.',freq:7},
+{cat:"sas",text:'PROC SORT pentru sortare descresc\u0103toare dup\u0103 2 variabile (Postal_Code \u0219i Employee_ID, AMBELE descresc\u0103tor):',opts:['a) by descending Postal_Code Employee_ID;','b) by descending Postal_Code descending Employee_ID;','c) by Postal_Code descending Employee_ID descending;','d) by Postal_Code, Employee_ID descending;'],correct:1,ex:'DESCENDING se pune \u00een fa\u021ba FIEC\u0102REI variabile care trebuie sortat\u0103 descresc\u0103tor. F\u0103r\u0103 DESCENDING = cresc\u0103tor (default).',freq:7},
+{cat:"sas",text:'DATA recente; SET carti; WHERE an eq 2013; RUN; are ca rezultat:',opts:['a) Un raport','b) Un SET DE DATE SAS','c) O procedur\u0103','d) Un fi\u0219ier text'],correct:1,ex:'DATA step creeaz\u0103 \u00eentotdeauna un SET DE DATE SAS (fizic \u00een WORK sau alt\u0103 bibliotec\u0103). WHERE filtreaz\u0103 observa\u021biile \u00eenainte de scriere.',freq:7},
+{cat:"python",text:'Python: date={"A":10,"B":20}; print(date.get("C",0) + date["A"])',opts:['a) 30','b) Eroare (cheia C nu exist\u0103)','c) 10','d) 0'],correct:2,ex:'date.get("C",0) returneaz\u0103 0 (valoarea default, deoarece "C" nu exist\u0103). date["A"] = 10. 0+10=10.',freq:5},
+{cat:"python",text:'a=(1,2); a[0]+=1',opts:['a) (2,2)','b) (1,3)','c) Type Error (tuplul e imutabil)','d) Eroare de sintax\u0103'],correct:2,ex:'Tuplele sunt IMUTABILE \u00een Python. Operatia a[0]+=1 \u00eencearc\u0103 s\u0103 modifice tuplul \u2192 TypeError.',freq:5},
+{cat:"pandas",text:'Pandas — \u00eenlocuire valori lips\u0103 din coloana Pret cu media:',opts:['a) df["Pret"]=df["Pret"].fillna(df["Pret"].mean())','b) df["Pret"]=df["Pret"].dropna()','c) df["Pret"]=df["Pret"].interpolate()','d) df["Pret"]=df["Pret"].replace(np.nan, 0)'],correct:0,ex:'fillna(valoare) completeaz\u0103 NaN-urile cu valoarea dat\u0103. mean() calculeaz\u0103 media coloanei \u2014 \u00eenlocuie\u0219te lipsurile cu media.',freq:5},
+{cat:"teorie",text:'Cloud dup\u0103 tipul de servicii se clasific\u0103 \u00een:',opts:['a) Public, Private, Hybrid, Community','b) PaaS, IaaS, SaaS','c) SaaS, DaaS, PaaS','d) IaaS, PaaS, DaaS'],correct:1,ex:'Dup\u0103 tipul serviciilor: PaaS (Platform), IaaS (Infrastructure), SaaS (Software). Varianta (a) = clasificare dup\u0103 amplasare.',freq:5},
+{cat:"teorie",text:'Software liber — afirma\u021bia corect\u0103:',opts:['a) Pentru software-ul liber COSTUL NU este un criteriu','b) Software-ul liber este \u00eentotdeauna gratuit','c) Software-ul liber nu poate fi distribuit','d) Software-ul liber nu are cod surs\u0103 disponibil'],correct:0,ex:'Software liber (free software) = libertate, nu pre\u021b. Costul nu e un criteriu \u2014 poate fi \u0219i comercial.',freq:4}
+];
+let currentFilter = 'all';
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuestions(filter) {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  const filtered = questions.filter(q => filter === 'all' || q.cat === filter);
+  document.getElementById('total-count').textContent = filtered.length + ' grile';
+
+  filtered.forEach((q, dispIdx) => {
+    const globalIdx = questions.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'q-card';
+    div.id = 'q-' + globalIdx;
+    const letters = ['a','b','c','d'];
+    const optsHtml = q.opts.map((opt, i) => {
+      let cls = 'opt';
+      if (answered[globalIdx] !== undefined) {
+        if (i === q.correct) cls += ' reveal-correct';
+        else if (i === answered[globalIdx] && answered[globalIdx] !== q.correct) cls += ' wrong';
+      }
+      const letter = letters[i] || String.fromCharCode(97 + i);
+      return `<div class="${cls}" onclick="selectAnswer(${globalIdx},${i})">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${opt}</span>
+      </div>`;
+    }).join('');
+    let fbHtml = '';
+    if (answered[globalIdx] !== undefined) {
+      const isC = answered[globalIdx] === q.correct;
+      fbHtml = `<div class="feedback ${isC?'correct-fb':'wrong-fb'} show">${isC?'✓ Corect! ':'✗ Greșit! '}${q.ex}</div>`;
+    }
+    div.innerHTML = `<div class="q-meta"><span class="q-num">#${dispIdx+1}</span><span class="q-freq">Apare de ${q.freq} ori</span><span class="q-cat cat-${q.cat}">${q.cat.toUpperCase()}</span></div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>${fbHtml}`;
+    container.appendChild(div);
+  });
+  updateStats();
+}
+
+function selectAnswer(gi, oi) {
+  if (answered[gi] !== undefined) return;
+  answered[gi] = oi;
+  if (oi === questions[gi].correct) correctCount++; else wrongCount++;
+  renderQuestions(currentFilter);
+  updateProgress();
+}
+
+function updateStats() {
+  document.getElementById('correct-count').textContent = '✓ ' + correctCount;
+  document.getElementById('wrong-count').textContent = '✗ ' + wrongCount;
+  const total = Object.keys(answered).length;
+  if (total === questions.length) {
+    const box = document.getElementById('score-box');
+    box.classList.add('show');
+    document.getElementById('score-text').textContent = correctCount + ' / ' + questions.length;
+    const pct = Math.round(correctCount / questions.length * 100);
+    document.getElementById('score-pct').textContent = pct + '% r\u0103spunsuri corecte';
+    box.scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function updateProgress() {
+  const pct = Object.keys(answered).length / questions.length * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function shuffleAll() {
+  for (let i = questions.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions.forEach(q => {
+    const correctOpt = q.opts[q.correct];
+    for (let i = q.opts.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [q.opts[i],q.opts[j]] = [q.opts[j],q.opts[i]];
+    }
+    q.correct = q.opts.indexOf(correctOpt);
+  });
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function resetAll() {
+  answered = {}; correctCount = 0; wrongCount = 0;
+  document.getElementById('score-box').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestions(currentFilter);
+}
+
+function revealAll() {
+  questions.forEach((q,i) => { if (answered[i]===undefined) answered[i]=q.correct; });
+  renderQuestions(currentFilter);
+}
+
+function filterCat(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuestions(cat);
+}
+
+renderQuestions('all');
+</script>
+</body>
+</html>
